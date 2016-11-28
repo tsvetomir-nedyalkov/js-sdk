@@ -102,7 +102,7 @@ describe('User', function() {
         });
 
       // Logout the test user
-      await TestUser.logout();
+      await User.logout();
 
       // Login
       user = await user.login(username, password);
@@ -141,7 +141,7 @@ describe('User', function() {
         });
 
       // Logout the test user
-      await TestUser.logout();
+      await User.logout();
 
       // Login
       user = await user.login({
@@ -187,7 +187,7 @@ describe('User', function() {
         });
 
       // Logout the test user
-      await TestUser.logout();
+      await User.logout();
 
       // Login
       user = await user.login({
