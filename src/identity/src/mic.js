@@ -5,6 +5,7 @@ import { AuthType, RequestMethod, KinveyRequest } from '../../request';
 import { KinveyError, MobileIdentityConnectError } from '../../errors';
 import { isDefined } from '../../utils';
 import Promise from 'es6-promise';
+import client from '../../client';
 import path from 'path';
 import url from 'url';
 import isString from 'lodash/isString';
@@ -45,7 +46,7 @@ export class MobileIdentityConnect extends Identity {
   }
 
   login(redirectUri, authorizationGrant = AuthorizationGrant.AuthorizationCodeLoginPage, options = {}) {
-    const clientId = this.client.appKey;
+    const clientId = client.appKey;
     options.version = isDefined(options.version) ? options.version : 'v3'; // Set default version to v3
 
     const promise = Promise.resolve()
@@ -67,8 +68,8 @@ export class MobileIdentityConnect extends Identity {
         session.identity = MobileIdentityConnect.identity;
         session.client_id = clientId;
         session.redirect_uri = redirectUri;
-        session.protocol = this.client.micProtocol;
-        session.host = this.client.micHost;
+        session.protocol = client.micProtocol;
+        session.host = client.micHost;
         return session;
       });
 
@@ -94,8 +95,8 @@ export class MobileIdentityConnect extends Identity {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       url: url.format({
-        protocol: this.client.micProtocol,
-        host: this.client.micHost,
+        protocol: client.micProtocol,
+        host: client.micHost,
         pathname: path.join(pathname, authPathname)
       }),
       properties: options.properties,
@@ -126,8 +127,8 @@ export class MobileIdentityConnect extends Identity {
       }
 
       return popup.open(url.format({
-        protocol: this.client.micProtocol,
-        host: this.client.micHost,
+        protocol: client.micProtocol,
+        host: client.micHost,
         pathname: path.join(pathname, authPathname),
         query: {
           client_id: clientId,
@@ -229,8 +230,8 @@ export class MobileIdentityConnect extends Identity {
       },
       authType: AuthType.App,
       url: url.format({
-        protocol: this.client.micProtocol,
-        host: this.client.micHost,
+        protocol: client.micProtocol,
+        host: client.micHost,
         pathname: tokenPathname
       }),
       properties: options.properties,
@@ -252,8 +253,8 @@ export class MobileIdentityConnect extends Identity {
       },
       authType: AuthType.App,
       url: url.format({
-        protocol: this.client.micProtocol,
-        host: this.client.micHost,
+        protocol: client.micProtocol,
+        host: client.micHost,
         pathname: invalidatePathname,
         query: { user: user._id }
       }),

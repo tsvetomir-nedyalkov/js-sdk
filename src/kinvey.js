@@ -1,4 +1,4 @@
-import { Client } from './client';
+import client from './client';
 import { CustomEndpoint } from './endpoint';
 import Query from './query';
 import { Log } from './utils';
@@ -39,20 +39,6 @@ const appdataNamespace = process.env.KINVEY_DATASTORE_NAMESPACE || 'appdata';
  */
 class Kinvey {
   /**
-   * Returns the shared instance of the Client class used by the SDK.
-   *
-   * @throws {KinveyError} If a shared instance does not exist.
-   *
-   * @return {Client} The shared instance.
-   *
-   * @example
-   * var client = Kinvey.client;
-   */
-  static get client() {
-    return Client.sharedInstance();
-  }
-
-  /**
    * The version of your app. It will sent with Kinvey API requests
    * using the X-Kinvey-Api-Version header.
    *
@@ -62,7 +48,7 @@ class Kinvey {
    * var appVersion = Kinvey.appVersion;
    */
   static get appVersion() {
-    return this.client.appVersion;
+    return client.appVersion;
   }
 
   /**
@@ -77,7 +63,7 @@ class Kinvey {
    * Kinvey.appVersion = 'v1';
    */
   static set appVersion(appVersion) {
-    this.client.appVersion = appVersion;
+    client.appVersion = appVersion;
   }
 
   /**
@@ -117,8 +103,8 @@ class Kinvey {
         + ' Unable to create a new Client without an App Key.');
     }
 
-    // Initialize the client
-    const client = Client.init(options);
+    // Configure the client
+    client.config(options);
 
     // Load the active user
     User.loadActiveUserLegacy(client);
@@ -171,8 +157,8 @@ class Kinvey {
       );
     }
 
-    // Initialize the client
-    const client = Client.initialize(options);
+    // Configure the client
+    client.config(options);
 
     // Load the active user
     return User.loadActiveUser(client);
@@ -190,7 +176,7 @@ class Kinvey {
    *   console.log('Kinvey Ping Failed. Response: ' + error.description);
    * });
    */
-  static ping(client = Client.sharedInstance()) {
+  static ping() {
     const request = new KinveyRequest({
       method: RequestMethod.GET,
       authType: AuthType.All,

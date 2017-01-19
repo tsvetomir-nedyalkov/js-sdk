@@ -1,6 +1,7 @@
-import { Client } from '../../client';
+import Client from '../../client';
 import { KinveyError } from '../../errors';
 import Promise from 'es6-promise';
+import client from '../../client';
 import localStorage from 'local-storage';
 import assign from 'lodash/assign';
 let hello;
@@ -13,10 +14,6 @@ if (typeof window !== 'undefined') {
  * @private
  */
 export default class Identity {
-  constructor(options = {}) {
-    this.client = options.client || Client.sharedInstance();
-  }
-
   get identity() {
     throw new KinveyError('A subclass must override this property.');
   }
@@ -26,14 +23,14 @@ export default class Identity {
   }
 
   get session() {
-    return localStorage.get(`${this.client.appKey}${this.identity}`);
+    return localStorage.get(`${client.appKey}${this.identity}`);
   }
 
   set session(session) {
     if (session) {
-      localStorage.set(`${this.client.appKey}${this.identity}`, session);
+      localStorage.set(`${client.appKey}${this.identity}`, session);
     } else {
-      localStorage.remove(`${this.client.appKey}${this.identity}`);
+      localStorage.remove(`${client.appKey}${this.identity}`);
     }
   }
 

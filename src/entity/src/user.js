@@ -1,4 +1,4 @@
-import { Client } from '../../client';
+import client from '../../client';
 import Acl from './acl';
 import Metadata from './metadata';
 import { AuthType, RequestMethod, KinveyRequest, CacheRequest } from '../../request';
@@ -33,21 +33,13 @@ export default class User {
    * @param {Object} [options={}] Options.
    * @return {User} User
    */
-  constructor(data = {}, options = {}) {
+  constructor(data = {}) {
     /**
      * The users data.
      *
      * @type {Object}
      */
     this.data = data;
-
-    /**
-     * @private
-     * The client used by this user.
-     *
-     * @type {Client}
-     */
-    this.client = options.client || Client.sharedInstance();
   }
 
   /**
@@ -155,7 +147,7 @@ export default class User {
    * @private
    */
   get pathname() {
-    return `/${usersNamespace}/${this.client.appKey}`;
+    return `/${usersNamespace}/${client.appKey}`;
   }
 
   /**
@@ -164,7 +156,7 @@ export default class User {
    * @return {boolean} True the user is the active user otherwise false.
    */
   isActive() {
-    const activeUser = User.getActiveUser(this.client);
+    const activeUser = User.getActiveUser();
 
     if (isDefined(activeUser) && activeUser._id === this._id) {
       return true;
@@ -188,14 +180,14 @@ export default class User {
    *
    * @deprecated Please use `User.loadActiveUser()`.
    *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
+   * @param {Client} [client=Client] Client to use to load the active user.
    * @return {?User} The active user.
    */
-  static loadActiveUserLegacy(client = Client.sharedInstance()) {
-    const activeUserData = CacheRequest.loadActiveUserLegacy(client);
+  static loadActiveUserLegacy() {
+    const activeUserData = CacheRequest.loadActiveUserLegacy();
 
     if (isDefined(activeUserData)) {
-      return new User(activeUserData, { client: client });
+      return new User(activeUserData);
     }
 
     return null;
@@ -204,26 +196,26 @@ export default class User {
   /**
    * Loads the active user.
    *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
+   * @param {Client} [client=Client] Client to use to load the active user.
    * @return {?User} The active user.
    */
-  static loadActiveUser(client = Client.sharedInstance()) {
-    return CacheRequest.loadActiveUser(client)
+  static loadActiveUser() {
+    return CacheRequest.loadActiveUser()
       .then((activeUserData) => {
         if (isDefined(activeUserData)) {
           if (isDefined(activeUserData._socialIdentity)
             && isDefined(activeUserData._socialIdentity[MobileIdentityConnect.identity])) {
             const session = activeUserData._socialIdentity[MobileIdentityConnect.identity];
-            return this.connectIdentity(MobileIdentityConnect.identity, session, { client: client });
+            return this.connectIdentity(MobileIdentityConnect.identity, session);
           }
 
-          return new User(activeUserData, { client: client });
+          return new User(activeUserData);
         }
 
         return null;
       })
       .then((activeUser) => {
-        return CacheRequest.setActiveUser(client, activeUser);
+        return CacheRequest.setActiveUser(activeUser);
       })
       .then((activeUser) => {
         if (isDefined(activeUser)) {
@@ -238,14 +230,14 @@ export default class User {
    * Gets the active user. You can optionally provide a client
    * to use to lookup the active user.
    *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to lookup active user.
+   * @param {Client} [client=Client] Client to use to lookup active user.
    * @return {?User} The active user.
    */
-  static getActiveUser(client = Client.sharedInstance()) {
-    const data = CacheRequest.getActiveUser(client);
+  static getActiveUser() {
+    const data = CacheRequest.getActiveUser();
 
     if (isDefined(data)) {
-      return new User(data, { client: client });
+      return new User(data);
     }
 
     return null;
@@ -262,7 +254,7 @@ export default class User {
   login(username, password, options = {}) {
     let credentials = username;
     const isActive = this.isActive();
-    const activeUser = User.getActiveUser(this.client);
+    const activeUser = User.getActiveUser();
 
     if (isActive === true) {
       return Promise.reject(new ActiveUserError('This user is already the active user.'));
@@ -305,14 +297,13 @@ export default class User {
       method: RequestMethod.POST,
       authType: AuthType.App,
       url: url.format({
-        protocol: this.client.apiProtocol,
-        host: this.client.apiHost,
+        protocol: client.apiProtocol,
+        host: client.apiHost,
         pathname: `${this.pathname}/login`
       }),
       body: credentials,
       properties: options.properties,
-      timeout: options.timeout,
-      client: this.client
+      timeout: options.timeout
     });
 
     return request.execute()
@@ -327,7 +318,7 @@ export default class User {
         }
 
         this.data = data;
-        return CacheRequest.setActiveUser(this.client, this.data);
+        return CacheRequest.setActiveUser(this.data);
       })
       .then(() => this);
   }
@@ -355,7 +346,7 @@ export default class User {
    */
   loginWithMIC(redirectUri, authorizationGrant, options = {}) {
     const isActive = this.isActive();
-    const activeUser = User.getActiveUser(this.client);
+    const activeUser = User.getActiveUser();
 
     if (isActive) {
       throw new ActiveUserError('This user is already the active user.');
@@ -365,7 +356,7 @@ export default class User {
       throw new ActiveUserError('An active user already exists. Please logout the active user before you login.');
     }
 
-    const mic = new MobileIdentityConnect({ client: this.client });
+    const mic = new MobileIdentityConnect();
     return mic.login(redirectUri, authorizationGrant, options)
       .then(session => this.connectIdentity(MobileIdentityConnect.identity, session, options));
   }
@@ -447,7 +438,7 @@ export default class User {
    * @return {Promise<User>}                The user.
    */
   connectFacebook(clientId, options = {}) {
-    const facebook = new Facebook({ client: this.client });
+    const facebook = new Facebook();
     return facebook.login(clientId, options)
       .then(session => this.connectIdentity(Facebook.identity, session, options));
   }
@@ -480,7 +471,7 @@ export default class User {
    * @return {Promise<User>}                The user.
    */
   connectGoogle(clientId, options = {}) {
-    const google = new Google({ client: this.client });
+    const google = new Google();
     return google.login(clientId, options)
       .then(session => this.connectIdentity(Google.identity, session, options));
   }
@@ -513,7 +504,7 @@ export default class User {
    * @return {Promise<User>}                The user.
    */
   googleconnectLinkedIn(clientId, options = {}) {
-    const linkedIn = new LinkedIn({ client: this.client });
+    const linkedIn = new LinkedIn();
     return linkedIn.login(clientId, options)
       .then(session => this.connectIdentity(LinkedIn.identity, session, options));
   }
@@ -592,13 +583,12 @@ export default class User {
       method: RequestMethod.POST,
       authType: AuthType.Session,
       url: url.format({
-        protocol: this.client.apiProtocol,
-        host: this.client.apiHost,
+        protocol: client.apiProtocol,
+        host: client.apiHost,
         pathname: `${this.pathname}/_logout`
       }),
       properties: options.properties,
-      timeout: options.timeout,
-      client: this.client
+      timeout: options.timeout
     });
 
     return request.execute()
@@ -606,12 +596,12 @@ export default class User {
         Log.error(error);
         return null;
       })
-      .then(() => CacheRequest.setActiveUser(this.client, null))
+      .then(() => CacheRequest.setActiveUser(null))
       .catch((error) => {
         Log.error(error);
         return null;
       })
-      .then(() => DataStore.clearCache({ client: this.client }))
+      .then(() => DataStore.clearCache())
       .catch((error) => {
         Log.error(error);
         return null;
@@ -626,7 +616,7 @@ export default class User {
    * @return {Promise<User>} The user.
    */
   static logout(options = {}) {
-    const activeUser = User.getActiveUser(options.client);
+    const activeUser = User.getActiveUser();
 
     if (isDefined(activeUser)) {
       return activeUser.logout(options);
@@ -645,7 +635,7 @@ export default class User {
    * @return {Promise<User>} The user.
    */
   signup(data, options = {}) {
-    const activeUser = User.getActiveUser(this.client);
+    const activeUser = User.getActiveUser();
     options = assign({
       state: true
     }, options);
@@ -662,14 +652,13 @@ export default class User {
       method: RequestMethod.POST,
       authType: AuthType.App,
       url: url.format({
-        protocol: this.client.protocol,
-        host: this.client.host,
+        protocol: client.protocol,
+        host: client.host,
         pathname: this.pathname
       }),
       body: isEmpty(data) ? null : data,
       properties: options.properties,
-      timeout: options.timeout,
-      client: this.client
+      timeout: options.timeout
     });
 
     return request.execute()
@@ -678,7 +667,7 @@ export default class User {
         this.data = data;
 
         if (options.state === true) {
-          return CacheRequest.setActiveUser(this.client, this.data);
+          return CacheRequest.setActiveUser(this.data);
         }
 
         return this;
@@ -744,7 +733,7 @@ export default class User {
     return store.update(data, options)
       .then((data) => {
         if (this.isActive()) {
-          return CacheRequest.setActiveUser(this.client, data);
+          return CacheRequest.setActiveUser(data);
         }
 
         return data;
@@ -763,7 +752,7 @@ export default class User {
    * @return {Promise<User>} The user.
    */
   static update(data, options = {}) {
-    const activeUser = User.getActiveUser(options.client);
+    const activeUser = User.getActiveUser();
 
     if (isDefined(activeUser)) {
       return activeUser.update(data, options);
@@ -783,8 +772,8 @@ export default class User {
       method: RequestMethod.GET,
       authType: AuthType.Session,
       url: url.format({
-        protocol: this.client.protocol,
-        host: this.client.host,
+        protocol: client.protocol,
+        host: client.host,
         pathname: `${this.pathname}/_me`
       }),
       properties: options.properties,
@@ -795,7 +784,7 @@ export default class User {
       .then(response => response.data)
       .then((data) => {
         if (!isDefined(data[kmdAttribute].authtoken)) {
-          const activeUser = User.getActiveUser(this.client);
+          const activeUser = User.getActiveUser();
 
           if (isDefined(activeUser)) {
             data[kmdAttribute].authtoken = activeUser.authtoken;
@@ -808,7 +797,7 @@ export default class User {
       })
       .then((data) => {
         this.data = data;
-        return CacheRequest.setActiveUser(this.client, data);
+        return CacheRequest.setActiveUser(data);
       })
       .then(() => this);
   }
@@ -820,7 +809,7 @@ export default class User {
    * @return {Promise<User>} The user.
    */
   static me(options = {}) {
-    const activeUser = User.getActiveUser(options.client);
+    const activeUser = User.getActiveUser();
 
     if (activeUser) {
       return activeUser.me(options);
@@ -848,7 +837,6 @@ export default class User {
       return Promise.reject(new KinveyError('The provided username is not a string.'));
     }
 
-    const client = options.client || Client.sharedInstance();
     const request = new KinveyRequest({
       method: RequestMethod.POST,
       authType: AuthType.App,
@@ -858,8 +846,7 @@ export default class User {
         pathname: `/${rpcNamespace}/${client.appKey}/${username}/user-email-verification-initiate`
       }),
       properties: options.properties,
-      timeout: options.timeout,
-      client: client
+      timeout: options.timeout
     });
     return request.execute()
       .then(response => response.data);
@@ -884,7 +871,6 @@ export default class User {
       return Promise.reject(new KinveyError('The provided email is not a string.'));
     }
 
-    const client = options.client || Client.sharedInstance();
     const request = new KinveyRequest({
       method: RequestMethod.POST,
       authType: AuthType.App,
@@ -895,8 +881,7 @@ export default class User {
       }),
       properties: options.properties,
       data: { email: email },
-      timeout: options.timeout,
-      client: client
+      timeout: options.timeout
     });
     return request.execute()
       .then(response => response.data);
@@ -921,7 +906,6 @@ export default class User {
       return Promise.reject(new KinveyError('The provided username is not a string.'));
     }
 
-    const client = options.client || Client.sharedInstance();
     const request = new KinveyRequest({
       method: RequestMethod.POST,
       authType: AuthType.App,
@@ -931,8 +915,7 @@ export default class User {
         pathname: `/${rpcNamespace}/${client.appKey}/${username}/user-password-reset-initiate`
       }),
       properties: options.properties,
-      timeout: options.timeout,
-      client: client
+      timeout: options.timeout
     });
     return request.execute()
       .then(response => response.data);

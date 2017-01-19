@@ -1,10 +1,10 @@
 import { CacheRequest, RequestMethod } from '../../request';
 import { KinveyError } from '../../errors';
-import { Client } from '../../client';
 import NetworkStore from './networkstore';
 import CacheStore from './cachestore';
 import SyncStore from './syncstore';
 import url from 'url';
+import client from '../../client';
 const appdataNamespace = process.env.KINVEY_DATASTORE_NAMESPACE || 'appdata';
 
 /**
@@ -74,7 +74,6 @@ export default class DataStore {
    * @return {Promise<Object>} The result of clearing the cache.
    */
   static clearCache(options = {}) {
-    const client = options.client || Client.sharedInstance();
     const pathname = `/${appdataNamespace}/${client.appKey}`;
     const request = new CacheRequest({
       method: RequestMethod.DELETE,

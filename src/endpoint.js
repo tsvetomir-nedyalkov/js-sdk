@@ -1,4 +1,4 @@
-import { Client } from './client';
+import client from './client';
 import { RequestMethod, AuthType, KinveyRequest } from './request';
 import { KinveyError } from './errors';
 import url from 'url';
@@ -33,8 +33,6 @@ export class CustomEndpoint {
    * });
    */
   static execute(endpoint, args, options = {}) {
-    const client = options.client || Client.sharedInstance();
-
     if (!endpoint) {
       return Promise.reject(new KinveyError('An endpoint argument is required.'));
     }
@@ -53,8 +51,7 @@ export class CustomEndpoint {
       }),
       properties: options.properties,
       body: args,
-      timeout: options.timeout,
-      client: client
+      timeout: options.timeout
     });
     return request.execute().then(response => response.data);
   }

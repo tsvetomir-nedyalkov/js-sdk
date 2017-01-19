@@ -4,6 +4,7 @@ import { KinveyObservable, isDefined } from '../../utils';
 import Query from '../../query';
 import NetworkStore from './networkstore';
 import Promise from 'es6-promise';
+import client from '../../client';
 import url from 'url';
 import isArray from 'lodash/isArray';
 const usersNamespace = process.env.KINVEY_USERS_NAMESPACE || 'user';
@@ -23,7 +24,7 @@ class UserStore extends NetworkStore {
    * @return  {string}   Pathname
    */
   get pathname() {
-    return `/${usersNamespace}/${this.client.appKey}`;
+    return `/${usersNamespace}/${client.appKey}`;
   }
 
   /**
@@ -45,15 +46,14 @@ class UserStore extends NetworkStore {
         method: RequestMethod.POST,
         authType: AuthType.Default,
         url: url.format({
-          protocol: this.client.protocol,
-          host: this.client.host,
+          protocol: client.protocol,
+          host: client.host,
           pathname: `${this.pathname}/_lookup`,
           query: options.query
         }),
         properties: options.properties,
         body: isDefined(query) ? query.toPlainObject().filter : null,
-        timeout: options.timeout,
-        client: this.client
+        timeout: options.timeout
       });
 
       // Execute the request
@@ -113,14 +113,13 @@ class UserStore extends NetworkStore {
       method: RequestMethod.POST,
       authType: AuthType.App,
       url: url.format({
-        protocol: this.client.protocol,
-        host: this.client.host,
-        pathname: `/${rpcNamespace}/${this.client.appKey}/check-username-exists`
+        protocol: client.protocol,
+        host: client.host,
+        pathname: `/${rpcNamespace}/${client.appKey}/check-username-exists`
       }),
       properties: options.properties,
       data: { username: username },
-      timeout: options.timeout,
-      client: this.client
+      timeout: options.timeout
     });
     return request.execute()
       .then(response => response.data)
@@ -141,13 +140,12 @@ class UserStore extends NetworkStore {
       method: RequestMethod.POST,
       authType: AuthType.Master,
       url: url.format({
-        protocol: this.client.protocol,
-        host: this.client.host,
+        protocol: client.protocol,
+        host: client.host,
         pathname: `${this.pathname}/${id}`
       }),
       properties: options.properties,
-      timeout: options.timeout,
-      client: this.client
+      timeout: options.timeout
     });
     return request.execute()
       .then(response => response.data);

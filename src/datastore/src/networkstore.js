@@ -1,7 +1,7 @@
 import { DeltaFetchRequest, KinveyRequest, AuthType, RequestMethod } from '../../request';
 import { KinveyError } from '../../errors';
 import Query from '../../query';
-import { Client } from '../../client';
+import client from '../../client';
 import { KinveyObservable, Log, isDefined } from '../../utils';
 import Aggregation from '../../aggregation';
 import Promise from 'es6-promise';
@@ -26,38 +26,9 @@ export default class NetworkStore {
     this.collection = collection;
 
     /**
-     * @type {Client}
-     */
-    this.client = options.client;
-
-    /**
      * @type {boolean}
      */
     this.useDeltaFetch = options.useDeltaFetch === true;
-  }
-
-  /**
-   * The client for the store.
-   * @return {Client} Client
-   */
-  get client() {
-    if (isDefined(this._client)) {
-      return this._client;
-    }
-
-    return Client.sharedInstance();
-  }
-
-  /**
-   * Set the client for the store
-   * @param {Client} [client] Client
-   */
-  set client(client) {
-    if (client instanceof Client) {
-      this._client = client;
-    } else {
-      this._client = null;
-    }
   }
 
   /**
@@ -65,7 +36,7 @@ export default class NetworkStore {
    * @return  {string}  Pathname
    */
   get pathname() {
-    let pathname = `/${appdataNamespace}/${this.client.appKey}`;
+    let pathname = `/${appdataNamespace}/${client.appKey}`;
 
     if (this.collection) {
       pathname = `${pathname}/${this.collection}`;
@@ -86,8 +57,8 @@ export default class NetworkStore {
     if (!this._liveStream) {
       // Subscribe to KLS
       const source = new EventSource(url.format({
-        protocol: this.client.liveServiceProtocol,
-        host: this.client.liveServiceHost,
+        protocol: client.liveServiceProtocol,
+        host: client.liveServiceHost,
         pathname: this.pathname,
       }));
 
@@ -154,15 +125,14 @@ export default class NetworkStore {
         method: RequestMethod.GET,
         authType: AuthType.Default,
         url: url.format({
-          protocol: this.client.protocol,
-          host: this.client.host,
+          protocol: client.protocol,
+          host: client.host,
           pathname: this.pathname,
           query: options.query
         }),
         properties: options.properties,
         query: query,
-        timeout: options.timeout,
-        client: this.client
+        timeout: options.timeout
       };
       let request = new KinveyRequest(config);
 
@@ -205,14 +175,13 @@ export default class NetworkStore {
         method: RequestMethod.GET,
         authType: AuthType.Default,
         url: url.format({
-          protocol: this.client.protocol,
-          host: this.client.host,
+          protocol: client.protocol,
+          host: client.host,
           pathname: `${this.pathname}/${id}`,
           query: options.query
         }),
         properties: options.properties,
-        timeout: options.timeout,
-        client: this.client
+        timeout: options.timeout
       };
       let request = new KinveyRequest(config);
 
@@ -252,14 +221,13 @@ export default class NetworkStore {
         method: RequestMethod.POST,
         authType: AuthType.Default,
         url: url.format({
-          protocol: this.client.protocol,
-          host: this.client.host,
+          protocol: client.protocol,
+          host: client.host,
           pathname: `${this.pathname}/_group`,
         }),
         properties: options.properties,
         aggregation: aggregation,
-        timeout: options.timeout,
-        client: this.client
+        timeout: options.timeout
       });
 
       // Execute the request
@@ -297,15 +265,14 @@ export default class NetworkStore {
           method: RequestMethod.GET,
           authType: AuthType.Default,
           url: url.format({
-            protocol: this.client.protocol,
-            host: this.client.host,
+            protocol: client.protocol,
+            host: client.host,
             pathname: `${this.pathname}/_count`,
             query: options.query
           }),
           properties: options.properties,
           query: query,
-          timeout: options.timeout,
-          client: this.client
+          timeout: options.timeout
         });
 
         // Execute the request
@@ -352,15 +319,14 @@ export default class NetworkStore {
             method: RequestMethod.POST,
             authType: AuthType.Default,
             url: url.format({
-              protocol: this.client.protocol,
-              host: this.client.host,
+              protocol: client.protocol,
+              host: client.host,
               pathname: this.pathname,
               query: options.query
             }),
             properties: options.properties,
             data: entity,
-            timeout: options.timeout,
-            client: this.client
+            timeout: options.timeout
           });
           return request.execute();
         }))
@@ -406,15 +372,14 @@ export default class NetworkStore {
             method: RequestMethod.PUT,
             authType: AuthType.Default,
             url: url.format({
-              protocol: this.client.protocol,
-              host: this.client.host,
+              protocol: client.protocol,
+              host: client.host,
               pathname: `${this.pathname}/${entity._id}`,
               query: options.query
             }),
             properties: options.properties,
             data: entity,
-            timeout: options.timeout,
-            client: this.client
+            timeout: options.timeout
           });
           return request.execute();
         }))
@@ -472,15 +437,14 @@ export default class NetworkStore {
           method: RequestMethod.DELETE,
           authType: AuthType.Default,
           url: url.format({
-            protocol: this.client.protocol,
-            host: this.client.host,
+            protocol: client.protocol,
+            host: client.host,
             pathname: this.pathname,
             query: options.query
           }),
           properties: options.properties,
           query: query,
-          timeout: options.timeout,
-          client: this.client
+          timeout: options.timeout
         });
         return request.execute()
           .then(response => response.data)
@@ -517,8 +481,8 @@ export default class NetworkStore {
           method: RequestMethod.DELETE,
           authType: AuthType.Default,
           url: url.format({
-            protocol: this.client.protocol,
-            host: this.client.host,
+            protocol: client.protocol,
+            host: client.host,
             pathname: `${this.pathname}/${id}`,
             query: options.query
           }),

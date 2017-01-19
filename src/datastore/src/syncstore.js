@@ -4,6 +4,7 @@ import { KinveyError } from '../../errors';
 import Query from '../../query';
 import Aggregation from '../../aggregation';
 import { KinveyObservable } from '../../utils';
+import client from '../../client';
 import url from 'url';
 
 /**
@@ -40,8 +41,8 @@ export default class SyncStore extends CacheStore {
       const request = new CacheRequest({
         method: RequestMethod.GET,
         url: url.format({
-          protocol: this.client.protocol,
-          host: this.client.host,
+          protocol: client.protocol,
+          host: client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -79,8 +80,8 @@ export default class SyncStore extends CacheStore {
         const request = new CacheRequest({
           method: RequestMethod.GET,
           url: url.format({
-            protocol: this.client.protocol,
-            host: this.client.host,
+            protocol: client.protocol,
+            host: client.host,
             pathname: `${this.pathname}/${id}`,
             query: options.query
           }),
@@ -122,8 +123,8 @@ export default class SyncStore extends CacheStore {
       const request = new CacheRequest({
         method: RequestMethod.POST,
         url: url.format({
-          protocol: this.client.protocol,
-          host: this.client.host,
+          protocol: client.protocol,
+          host: client.host,
           pathname: `${this.pathname}/_group`
         }),
         properties: options.properties,
@@ -165,8 +166,8 @@ export default class SyncStore extends CacheStore {
         const request = new CacheRequest({
           method: RequestMethod.GET,
           url: url.format({
-            protocol: this.client.protocol,
-            host: this.client.host,
+            protocol: client.protocol,
+            host: client.host,
             pathname: this.pathname,
             query: options.query
           }),
