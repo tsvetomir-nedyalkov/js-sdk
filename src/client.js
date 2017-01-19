@@ -5,13 +5,12 @@ import assign from 'lodash/assign';
 import isString from 'lodash/isString';
 import isNumber from 'lodash/isNumber';
 const defaultTimeout = process.env.KINVEY_DEFAULT_TIMEOUT || 60000;
-let sharedInstance = null;
 
 /**
  * The Client class stores information about your application on the Kinvey platform. You can create mutiple clients
  * to send requests to different environments on the Kinvey platform.
  */
-export class Client {
+class Client {
   /**
    * Creates a new instance of the Client class.
    *
@@ -31,7 +30,7 @@ export class Client {
    *   appSecret: '<appSecret>'
    * });
    */
-  constructor(options = {}) {
+  config(options = {}) {
     options = assign({
       apiHostname: 'https://baas.kinvey.com',
       micHostname: 'https://auth.kinvey.com',
@@ -251,73 +250,6 @@ export class Client {
       keychainAccessGroup: this.keychainAccessGroup
     };
   }
-
-  /**
-   * Initializes the Client class by creating a new instance of the
-   * Client class and storing it as a shared instance.
-   *
-   * @deprecated Use `Client.initialize` instead.
-   *
-   * @param {Object}    options                                            Options
-   * @param {string}    [options.apiHostname='https://baas.kinvey.com']    Host name used for Kinvey API requests
-   * @param {string}    [options.micHostname='https://auth.kinvey.com']    Host name used for Kinvey MIC requests
-   * @param {string}    [options.appKey]                                   App Key
-   * @param {string}    [options.appSecret]                                App Secret
-   * @param {string}    [options.masterSecret]                             App Master Secret
-   * @param {string}    [options.encryptionKey]                            App Encryption Key
-   * @param {string}    [options.appVersion]                               App Version
-   * @return {Client}                                                      An instance of Client.
-   *
-   * @example
-   * var client = Kinvey.Client.init({
-   *   appKey: '<appKey>',
-   *   appSecret: '<appSecret>'
-   * });
-   * Kinvey.Client.sharedInstance() === client; // true
-   */
-  static init(options) {
-    const client = new Client(options);
-    sharedInstance = client;
-    return client;
-  }
-
-  /**
-   * Initializes the Client class by creating a new instance of the
-   * Client class and storing it as a shared instance. The returned promise
-   * resolves with the shared instance of the Client class.
-   *
-   * @param {Object}    options                                            Options
-   * @param {string}    [options.apiHostname='https://baas.kinvey.com']    Host name used for Kinvey API requests
-   * @param {string}    [options.micHostname='https://auth.kinvey.com']    Host name used for Kinvey MIC requests
-   * @param {string}    [options.appKey]                                   App Key
-   * @param {string}    [options.appSecret]                                App Secret
-   * @param {string}    [options.masterSecret]                             App Master Secret
-   * @param {string}    [options.encryptionKey]                            App Encryption Key
-   * @param {string}    [options.appVersion]                               App Version
-   * @return {Promise}                                                     A promise.
-   */
-  static initialize(options) {
-    const client = new Client(options);
-    sharedInstance = client;
-    return client;
-  }
-
-  /**
-   * Returns the shared instance of the Client class used by the SDK.
-   *
-   * @throws {KinveyError} If a shared instance does not exist.
-   *
-   * @return {Client} The shared instance.
-   *
-   * @example
-   * var client = Kinvey.Client.sharedInstance();
-   */
-  static sharedInstance() {
-    if (!sharedInstance) {
-      throw new KinveyError('You have not initialized the library. ' +
-        'Please call Kinvey.init() to initialize the library.');
-    }
-
-    return sharedInstance;
-  }
 }
+
+export default new Client();
