@@ -211,17 +211,26 @@ export default class User {
     return CacheRequest.loadActiveUser(client)
       .then((activeUserData) => {
         if (isDefined(activeUserData)) {
+          if (isDefined(activeUserData._socialIdentity)
+            && isDefined(activeUserData._socialIdentity[MobileIdentityConnect.identity])) {
+            const session = activeUserData._socialIdentity[MobileIdentityConnect.identity];
+            return this.connectIdentity(MobileIdentityConnect.identity, session, { client: client });
+          }
+
           return new User(activeUserData, { client: client });
         }
 
         return null;
       })
       .then((activeUser) => {
+        return CacheRequest.setActiveUser(client, activeUser);
+      })
+      .then((activeUser) => {
         if (isDefined(activeUser)) {
           return activeUser.me();
         }
 
-        return activeUser;
+        return null;
       });
   }
 
