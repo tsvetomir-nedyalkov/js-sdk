@@ -1,7 +1,7 @@
 import { Client } from '../../client';
 import Acl from './acl';
 import Metadata from './metadata';
-import { AuthType, RequestMethod, KinveyRequest, CacheRequest } from '../../request';
+import { AuthType, RequestMethod, KinveyRequest } from '../../request';
 import { KinveyError, NotFoundError, ActiveUserError } from '../../errors';
 import DataStore, { UserStore as store } from '../../datastore';
 import { Facebook, Google, LinkedIn, MobileIdentityConnect } from '../../identity';
@@ -184,74 +184,6 @@ export default class User {
   }
 
   /**
-   * Loads the active user (legacy).
-   *
-   * @deprecated Please use `User.loadActiveUser()`.
-   *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
-   * @return {?User} The active user.
-   */
-  static loadActiveUserLegacy(client = Client.sharedInstance()) {
-    const activeUserData = CacheRequest.loadActiveUserLegacy(client);
-
-    if (isDefined(activeUserData)) {
-      return new User(activeUserData, { client: client });
-    }
-
-    return null;
-  }
-
-  /**
-   * Loads the active user.
-   *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
-   * @return {?User} The active user.
-   */
-  static loadActiveUser(client = Client.sharedInstance()) {
-    return CacheRequest.loadActiveUser(client)
-      .then((activeUserData) => {
-        if (isDefined(activeUserData)) {
-          if (isDefined(activeUserData._socialIdentity)
-            && isDefined(activeUserData._socialIdentity[MobileIdentityConnect.identity])) {
-            const session = activeUserData._socialIdentity[MobileIdentityConnect.identity];
-            return this.connectIdentity(MobileIdentityConnect.identity, session, { client: client });
-          }
-
-          return new User(activeUserData, { client: client });
-        }
-
-        return null;
-      })
-      .then((activeUser) => {
-        return CacheRequest.setActiveUser(client, activeUser);
-      })
-      .then((activeUser) => {
-        if (isDefined(activeUser)) {
-          return activeUser.me();
-        }
-
-        return null;
-      });
-  }
-
-  /**
-   * Gets the active user. You can optionally provide a client
-   * to use to lookup the active user.
-   *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to lookup active user.
-   * @return {?User} The active user.
-   */
-  static getActiveUser(client = Client.sharedInstance()) {
-    const data = CacheRequest.getActiveUser(client);
-
-    if (isDefined(data)) {
-      return new User(data, { client: client });
-    }
-
-    return null;
-  }
-
-  /**
    * Login using a username or password.
    *
    * @param {string|Object} username Username or an object with username and password as properties.
@@ -327,7 +259,7 @@ export default class User {
         }
 
         this.data = data;
-        return CacheRequest.setActiveUser(this.client, this.data);
+        return this.client.setActiveUser(this.data);
       })
       .then(() => this);
   }
@@ -606,7 +538,7 @@ export default class User {
         Log.error(error);
         return null;
       })
-      .then(() => CacheRequest.setActiveUser(this.client, null))
+      .then(() => this.client.setActiveUser(null))
       .catch((error) => {
         Log.error(error);
         return null;
@@ -678,7 +610,7 @@ export default class User {
         this.data = data;
 
         if (options.state === true) {
-          return CacheRequest.setActiveUser(this.client, this.data);
+          return this.setActiveUser(this.data);
         }
 
         return this;
@@ -744,7 +676,7 @@ export default class User {
     return store.update(data, options)
       .then((data) => {
         if (this.isActive()) {
-          return CacheRequest.setActiveUser(this.client, data);
+          return this.client.setActiveUser(data);
         }
 
         return data;
@@ -788,7 +720,8 @@ export default class User {
         pathname: `${this.pathname}/_me`
       }),
       properties: options.properties,
-      timeout: options.timeout
+      timeout: options.timeout,
+      client: this.client
     });
 
     return request.execute()
@@ -808,7 +741,7 @@ export default class User {
       })
       .then((data) => {
         this.data = data;
-        return CacheRequest.setActiveUser(this.client, data);
+        return this.client.setActiveUser(data);
       })
       .then(() => this);
   }
@@ -969,5 +902,74 @@ export default class User {
    */
   static restore(id, options = {}) {
     return store.restore(id, options);
+  }
+
+    /**
+   * Loads the active user (legacy).
+   *
+   * @deprecated Please use `User.loadActiveUser()`.
+   *
+   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
+   * @return {?User} The active user.
+   */
+  static loadActiveUserLegacy(client = Client.sharedInstance()) {
+    const activeUserData = client.loadActiveUserLegacy();
+
+    if (isDefined(activeUserData)) {
+      return new User(activeUserData, { client: client });
+    }
+
+    return null;
+  }
+
+  /**
+   * Loads the active user.
+   *
+   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
+   * @return {?User} The active user.
+   */
+  static loadActiveUser(client = Client.sharedInstance()) {
+    return client.loadActiveUser()
+      .then((activeUserData) => {
+        if (isDefined(activeUserData)) {
+          if (isDefined(activeUserData._socialIdentity)
+            && isDefined(activeUserData._socialIdentity[MobileIdentityConnect.identity])) {
+            const session = activeUserData._socialIdentity[MobileIdentityConnect.identity];
+            return this.connectIdentity(MobileIdentityConnect.identity, session, { client: client });
+          }
+
+          return new User(activeUserData, { client: client });
+        }
+
+        return null;
+      })
+      .then((activeUser) => {
+        return client.setActiveUser(isDefined(activeUser) ? activeUser.data : null)
+          .then(() => activeUser);
+      })
+      .then((activeUser) => {
+        if (isDefined(activeUser)) {
+          return activeUser.me();
+        }
+
+        return null;
+      });
+  }
+
+  /**
+   * Gets the active user. You can optionally provide a client
+   * to use to lookup the active user.
+   *
+   * @param {Client} [client=Client.sharedInstance()] Client to use to lookup active user.
+   * @return {?User} The active user.
+   */
+  static getActiveUser(client = Client.sharedInstance()) {
+    const data = client.activeUser;
+
+    if (isDefined(data)) {
+      return new User(data, { client: client });
+    }
+
+    return null;
   }
 }

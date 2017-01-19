@@ -121,9 +121,9 @@ const Auth = {
    * @returns {Object}
    */
   session(client) {
-    const activeUser = LocalRequest.getActiveUser(client);
+    const activeUser = client.activeUser;
 
-    if (!isDefined(activeUser)) {
+    if (isDefined(activeUser) === false) {
       return Promise.reject(
         new NoActiveUserError('There is not an active user. Please login a user and retry the request.')
       );
@@ -394,7 +394,7 @@ export class KinveyRequest extends NetworkRequest {
       })
       .catch((error) => {
         if (error instanceof InvalidCredentialsError && retry === true) {
-          const activeUser = LocalRequest.getActiveUser(this.client);
+          const activeUser = this.client.activeUser;
 
           if (!isDefined(activeUser)) {
             throw error;
@@ -456,7 +456,7 @@ export class KinveyRequest extends NetworkRequest {
                 })
                 .then((user) => {
                   user._socialIdentity[session.identity] = defaults(user._socialIdentity[session.identity], session);
-                  return LocalRequest.setActiveUser(this.client, user);
+                  return this.client.setActiveUser(user);
                 })
                 .then(() => this.execute(rawResponse, false));
             }

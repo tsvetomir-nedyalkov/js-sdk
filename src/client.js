@@ -274,13 +274,7 @@ export class Client {
     let promise = Promise.resolve(null);
 
     if (isDefined(this.activeUser)) {
-      // Delete from memory
-      this._activeUser = null;
-
-      // Delete from local storage (legacy)
-      this.setActiveUserLegacy(null);
-
-      // Delete from cache
+       // Delete from cache
       const request = new CacheRequest({
         method: RequestMethod.DELETE,
         url: url.format({
@@ -290,7 +284,13 @@ export class Client {
         })
       });
       promise = request.execute()
-        .then(response => response.data);
+        .then(() => {
+          // Delete from memory
+          this._activeUser = null;
+
+          // Delete from local storage (legacy)
+          this.setActiveUserLegacy(null);
+        });
     }
 
     return promise

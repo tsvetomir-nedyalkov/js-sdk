@@ -149,8 +149,6 @@ describe('Kinvey', function () {
               _acl: {
                 creator: randomString()
               }
-            }, {
-              'content-type': 'application/json; charset=utf-8'
             });
 
           // Initialize Kinvey again
