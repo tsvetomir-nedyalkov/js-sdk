@@ -1,17 +1,12 @@
-import Request, { RequestMethod } from './request';
-import { Client } from '../../client';
+import Request from './request';
 import { KinveyResponse } from './response';
 import UrlPattern from 'url-pattern';
 import url from 'url';
-import localStorage from 'local-storage';
 import { KinveyError } from '../../errors';
 import Query from '../../query';
 import Aggregation from '../../aggregation';
-import Promise from 'es6-promise';
 import { isDefined } from '../../utils';
 import { CacheRack } from './rack';
-const usersNamespace = process.env.KINVEY_USERS_NAMESPACE || 'user';
-const activeUserCollectionName = process.env.KINVEY_USER_ACTIVE_COLLECTION_NAME || 'kinvey_active_user';
 
 /**
  * @private
@@ -101,111 +96,5 @@ export default class LocalRequest extends Request {
     obj.entityId = this.entityId;
     obj.encryptionKey = this.client ? this.client.encryptionKey : undefined;
     return obj;
-  }
-
-  static activeUsers = {};
-
-  static loadActiveUser(client = Client.sharedInstance()) {
-    const request = new LocalRequest({
-      method: RequestMethod.GET,
-      url: url.format({
-        protocol: client.protocol,
-        host: client.host,
-        pathname: `/${usersNamespace}/${client.appKey}/${activeUserCollectionName}`
-      })
-    });
-    return request.execute()
-      .then(response => response.data)
-      .then((users) => {
-        if (users.length > 0) {
-          return users[0];
-        }
-
-        // Try local storage (legacy)
-        return LocalRequest.loadActiveUserLegacy(client);
-      })
-      .catch(() => null);
-  }
-
-  static loadActiveUserLegacy(client = Client.sharedInstance()) {
-    return LocalRequest.getActiveUserLegacy(client);
-  }
-
-  static getActiveUser(client = Client.sharedInstance()) {
-    return LocalRequest.activeUsers[client.appKey];
-  }
-
-  static getActiveUserLegacy(client = Client.sharedInstance()) {
-    try {
-      return localStorage.get(`${client.appKey}kinvey_user`);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static setActiveUser(client = Client.sharedInstance(), user) {
-    let promise = Promise.resolve(null);
-    const activeUser = LocalRequest.getActiveUser(client);
-
-    if (isDefined(activeUser)) {
-      // Delete from local storage (legacy)
-      LocalRequest.setActiveUserLegacy(client, null);
-
-      // Delete from memory
-      LocalRequest.activeUsers[client.appKey] = null;
-
-      // Delete from cache
-      const request = new LocalRequest({
-        method: RequestMethod.DELETE,
-        url: url.format({
-          protocol: client.protocol,
-          host: client.host,
-          pathname: `/${usersNamespace}/${client.appKey}/${activeUserCollectionName}/${activeUser._id}`
-        })
-      });
-      promise = request.execute()
-        .then(response => response.data);
-    }
-
-    return promise
-      .then(() => {
-        if (isDefined(user) === false) {
-          return null;
-        }
-
-        // Save to memory
-        LocalRequest.activeUsers[client.appKey] = user;
-
-        // Save to local storage (legacy)
-        LocalRequest.setActiveUserLegacy(client, user);
-
-        // Save to cache
-        const request = new LocalRequest({
-          method: RequestMethod.POST,
-          url: url.format({
-            protocol: client.protocol,
-            host: client.host,
-            pathname: `/${usersNamespace}/${client.appKey}/${activeUserCollectionName}`
-          }),
-          body: user
-        });
-        return request.execute()
-          .then(response => response.data);
-      })
-      .then(() => user);
-  }
-
-  static setActiveUserLegacy(client = Client.sharedInstance(), user) {
-    try {
-      localStorage.remove(`${client.appKey}kinvey_user`);
-
-      if (isDefined(user)) {
-        localStorage.set(`${client.appKey}kinvey_user`, user);
-      }
-
-      return true;
-    } catch (error) {
-      return false;
-    }
   }
 }

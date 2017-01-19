@@ -1,9 +1,14 @@
 import { KinveyError } from './errors';
 import { Log, isDefined } from './utils';
+import { CacheRequest, RequestMethod } from './request';
+import localStorage from 'local-storage';
+import Promise from 'es6-promise';
 import url from 'url';
 import assign from 'lodash/assign';
 import isString from 'lodash/isString';
 import isNumber from 'lodash/isNumber';
+const usersNamespace = process.env.KINVEY_USERS_NAMESPACE || 'user';
+const activeUserCollectionName = process.env.KINVEY_USER_ACTIVE_COLLECTION_NAME || 'kinvey_active_user';
 const defaultTimeout = process.env.KINVEY_DEFAULT_TIMEOUT || 60000;
 let sharedInstance = null;
 
@@ -122,6 +127,10 @@ export class Client {
     this.defaultTimeout = isDefined(options.defaultTimeout) ? options.defaultTimeout : defaultTimeout;
   }
 
+  get activeUser() {
+    return this._activeUser;
+  }
+
   /**
    * API host name used for Kinvey API requests.
    */
@@ -225,6 +234,105 @@ export class Client {
     }
 
     this._defaultTimeout = timeout;
+  }
+
+  loadActiveUser() {
+    const request = new CacheRequest({
+      method: RequestMethod.GET,
+      url: url.format({
+        protocol: this.protocol,
+        host: this.host,
+        pathname: `/${usersNamespace}/${this.appKey}/${activeUserCollectionName}`
+      })
+    });
+    return request.execute()
+      .then(response => response.data)
+      .then((users) => {
+        if (users.length > 0) {
+          return users[0];
+        }
+
+        // Try local storage (legacy)
+        return this.loadActiveUserLegacy();
+      })
+      .catch(() => null);
+  }
+
+  loadActiveUserLegacy() {
+    return this.getActiveUserLegacy();
+  }
+
+  getActiveUserLegacy() {
+    try {
+      return localStorage.get(`${this.appKey}kinvey_user`);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  setActiveUser(activeUser) {
+    let promise = Promise.resolve(null);
+
+    if (isDefined(this.activeUser)) {
+      // Delete from memory
+      this._activeUser = null;
+
+      // Delete from local storage (legacy)
+      this.setActiveUserLegacy(null);
+
+      // Delete from cache
+      const request = new CacheRequest({
+        method: RequestMethod.DELETE,
+        url: url.format({
+          protocol: this.protocol,
+          host: this.host,
+          pathname: `/${usersNamespace}/${this.appKey}/${activeUserCollectionName}/${this.activeUser._id}`
+        })
+      });
+      promise = request.execute()
+        .then(response => response.data);
+    }
+
+    return promise
+      .then(() => {
+        if (isDefined(activeUser) === false) {
+          return null;
+        }
+
+        // Save to memory
+        this._activeUser = activeUser;
+
+        // Save to local storage (legacy)
+        this.setActiveUserLegacy(activeUser);
+
+        // Save to cache
+        const request = new CacheRequest({
+          method: RequestMethod.POST,
+          url: url.format({
+            protocol: this.protocol,
+            host: this.host,
+            pathname: `/${usersNamespace}/${this.appKey}/${activeUserCollectionName}`
+          }),
+          body: activeUser
+        });
+        return request.execute()
+          .then(response => response.data);
+      })
+      .then(() => activeUser);
+  }
+
+  setActiveUserLegacy(activeUser) {
+    try {
+      localStorage.remove(`${this.appKey}kinvey_user`);
+
+      if (isDefined(activeUser)) {
+        localStorage.set(`${this.appKey}kinvey_user`, activeUser);
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
