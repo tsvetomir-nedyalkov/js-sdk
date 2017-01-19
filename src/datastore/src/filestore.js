@@ -10,7 +10,6 @@ import { KinveyError } from '../../errors';
 import NetworkStore from './networkstore';
 import { Log } from '../../utils';
 import Promise from 'es6-promise';
-import client from '../../client';
 import url from 'url';
 import map from 'lodash/map';
 import assign from 'lodash/assign';
@@ -40,7 +39,7 @@ class FileStore extends NetworkStore {
    * @return  {string}  Pathname
    */
   get pathname() {
-    return `/${filesNamespace}/${client.appKey}`;
+    return `/${filesNamespace}/${this.client.appKey}`;
   }
 
   /**
@@ -209,13 +208,14 @@ class FileStore extends NetworkStore {
       method: RequestMethod.POST,
       authType: AuthType.Default,
       url: url.format({
-        protocol: client.protocol,
-        host: client.host,
+        protocol: this.client.protocol,
+        host: this.client.host,
         pathname: this.pathname
       }),
       properties: options.properties,
       timeout: options.timeout,
-      body: metadata
+      body: metadata,
+      client: this.client
     });
     request.headers.set('X-Kinvey-Content-Type', metadata.mimeType);
 
@@ -224,8 +224,8 @@ class FileStore extends NetworkStore {
     if (metadata._id) {
       request.method = RequestMethod.PUT;
       request.url = url.format({
-        protocol: client.protocol,
-        host: client.host,
+        protocol: this.client.protocol,
+        host: this.client.host,
         pathname: `${this.pathname}/${metadata._id}`,
         query: options.query
       });

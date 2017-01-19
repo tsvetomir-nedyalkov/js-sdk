@@ -52,7 +52,8 @@ export default class DeltaFetchRequest extends KinveyRequest {
       url: this.url,
       headers: this.headers,
       query: this.query,
-      timeout: this.timeout
+      timeout: this.timeout,
+      client: this.client
     });
     return request.execute()
       .then(response => response.data)
@@ -75,6 +76,7 @@ export default class DeltaFetchRequest extends KinveyRequest {
             authType: this.authType,
             query: query,
             timeout: this.timeout,
+            client: this.client,
             properties: this.properties,
             skipBL: this.skipBL,
             trace: this.trace,
@@ -122,6 +124,7 @@ export default class DeltaFetchRequest extends KinveyRequest {
                   authType: this.authType,
                   query: query,
                   timeout: this.timeout,
+                  client: this.client,
                   properties: this.properties,
                   skipBL: this.skipBL,
                   trace: this.trace,
@@ -171,6 +174,7 @@ export default class DeltaFetchRequest extends KinveyRequest {
           authType: this.authType,
           query: this.query,
           timeout: this.timeout,
+          client: this.client,
           properties: this.properties,
           skipBL: this.skipBL,
           trace: this.trace,

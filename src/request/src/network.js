@@ -10,7 +10,6 @@ import { SocialIdentity } from '../../identity';
 import { NetworkRack } from './rack';
 import Promise from 'es6-promise';
 import { deviceInformation } from './device';
-import client from '../../client';
 import url from 'url';
 import qs from 'qs';
 import appendQuery from 'append-query';
@@ -52,7 +51,7 @@ const Auth = {
    *
    * @returns {Object}
    */
-  all() {
+  all(client) {
     return Auth.session(client)
       .catch(() => Auth.basic(client));
   },
@@ -62,11 +61,11 @@ const Auth = {
    *
    * @returns {Object}
    */
-  app() {
+  app(client) {
     if (!client.appKey || !client.appSecret) {
       return Promise.reject(
         new Error('Missing client appKey and/or appSecret.'
-          + ' Use Kinvey.initialize() to set the appKey and appSecret for the client.')
+          + ' Use Kinvey.init() to set the appKey and appSecret for the client.')
       );
     }
 
@@ -82,7 +81,7 @@ const Auth = {
    *
    * @returns {Object}
    */
-  basic() {
+  basic(client) {
     return Auth.master(client)
       .catch(() => Auth.app(client));
   },
@@ -92,7 +91,7 @@ const Auth = {
    *
    * @returns {Object}
    */
-  master() {
+  master(client) {
     if (!client.appKey || !client.masterSecret) {
       return Promise.reject(
         new Error('Missing client appKey and/or appSecret.'
@@ -121,7 +120,7 @@ const Auth = {
    *
    * @returns {Object}
    */
-  session() {
+  session(client) {
     const activeUser = LocalRequest.getActiveUser(client);
 
     if (!isDefined(activeUser)) {
@@ -180,7 +179,7 @@ export class KinveyRequest extends NetworkRequest {
   }
 
   get appVersion() {
-    return client.appVersion;
+    return this.client.appVersion;
   }
 
   get query() {
@@ -321,27 +320,27 @@ export class KinveyRequest extends NetworkRequest {
       // Get the auth info based on the set AuthType
       switch (this.authType) {
         case AuthType.All:
-          promise = Auth.all();
+          promise = Auth.all(this.client);
           break;
         case AuthType.App:
-          promise = Auth.app();
+          promise = Auth.app(this.client);
           break;
         case AuthType.Basic:
-          promise = Auth.basic();
+          promise = Auth.basic(this.client);
           break;
         case AuthType.Master:
-          promise = Auth.master();
+          promise = Auth.master(this.client);
           break;
         case AuthType.None:
-          promise = Auth.none();
+          promise = Auth.none(this.client);
           break;
         case AuthType.Session:
-          promise = Auth.session();
+          promise = Auth.session(this.client);
           break;
         default:
-          promise = Auth.session()
+          promise = Auth.session(this.client)
             .catch((error) => {
-              return Auth.master()
+              return Auth.master(this.client)
                 .catch(() => {
                   throw error;
                 });
@@ -395,7 +394,7 @@ export class KinveyRequest extends NetworkRequest {
       })
       .catch((error) => {
         if (error instanceof InvalidCredentialsError && retry === true) {
-          const activeUser = LocalRequest.getActiveUser();
+          const activeUser = LocalRequest.getActiveUser(this.client);
 
           if (!isDefined(activeUser)) {
             throw error;
@@ -416,8 +415,8 @@ export class KinveyRequest extends NetworkRequest {
                 },
                 authType: AuthType.App,
                 url: url.format({
-                  protocol: session.protocol || client.micProtocol,
-                  host: session.host || client.micHost,
+                  protocol: session.protocol || this.client.micProtocol,
+                  host: session.host || this.client.micHost,
                   pathname: tokenPathname
                 }),
                 body: {
@@ -443,20 +442,21 @@ export class KinveyRequest extends NetworkRequest {
                     method: RequestMethod.POST,
                     authType: AuthType.App,
                     url: url.format({
-                      protocol: client.protocol,
-                      host: client.host,
-                      pathname: `/${usersNamespace}/${client.appKey}/login`
+                      protocol: this.client.protocol,
+                      host: this.client.host,
+                      pathname: `/${usersNamespace}/${this.client.appKey}/login`
                     }),
                     properties: this.properties,
                     body: data,
-                    timeout: this.timeout
+                    timeout: this.timeout,
+                    client: this.client
                   });
                   return loginRequest.execute()
                     .then(response => response.data);
                 })
                 .then((user) => {
                   user._socialIdentity[session.identity] = defaults(user._socialIdentity[session.identity], session);
-                  return LocalRequest.setActiveUser(user);
+                  return LocalRequest.setActiveUser(this.client, user);
                 })
                 .then(() => this.execute(rawResponse, false));
             }

@@ -6,7 +6,6 @@ import Aggregation from '../../aggregation';
 import SyncManager from './sync';
 import { Metadata } from '../../entity';
 import { KinveyObservable } from '../../utils';
-import client from '../../client';
 import differenceBy from 'lodash/differenceBy';
 import assign from 'lodash/assign';
 import keyBy from 'lodash/keyBy';
@@ -66,8 +65,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.GET,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -118,8 +117,8 @@ export default class CacheStore extends NetworkStore {
                 const request = new CacheRequest({
                   method: RequestMethod.PUT,
                   url: url.format({
-                    protocol: client.protocol,
-                    host: client.host,
+                    protocol: this.client.protocol,
+                    host: this.client.host,
                     pathname: this.pathname,
                     query: options.query
                   }),
@@ -166,8 +165,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.GET,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: `${this.pathname}/${id}`,
           query: options.query
         }),
@@ -204,8 +203,8 @@ export default class CacheStore extends NetworkStore {
                 const request = new CacheRequest({
                   method: RequestMethod.PUT,
                   url: url.format({
-                    protocol: client.protocol,
-                    host: client.host,
+                    protocol: this.client.protocol,
+                    host: this.client.host,
                     pathname: this.pathname,
                     query: options.query
                   }),
@@ -251,8 +250,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.POST,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: `${this.pathname}/_group`
         }),
         properties: options.properties,
@@ -325,8 +324,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.GET,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -403,8 +402,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.POST,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -470,8 +469,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.PUT,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -531,8 +530,8 @@ export default class CacheStore extends NetworkStore {
       const fetchRequest = new CacheRequest({
         method: RequestMethod.GET,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -549,8 +548,8 @@ export default class CacheStore extends NetworkStore {
           const removeRequest = new CacheRequest({
             method: RequestMethod.DELETE,
             url: url.format({
-              protocol: client.protocol,
-              host: client.host,
+              protocol: this.client.protocol,
+              host: this.client.host,
               pathname: this.pathname,
               query: options.query
             }),
@@ -618,8 +617,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.DELETE,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: `${this.pathname}/${id}`,
           query: options.query
         }),
@@ -689,8 +688,8 @@ export default class CacheStore extends NetworkStore {
       const request = new CacheRequest({
         method: RequestMethod.GET,
         url: url.format({
-          protocol: client.protocol,
-          host: client.host,
+          protocol: this.client.protocol,
+          host: this.client.host,
           pathname: this.pathname,
           query: options.query
         }),
@@ -707,8 +706,8 @@ export default class CacheStore extends NetworkStore {
           const request = new CacheRequest({
             method: RequestMethod.DELETE,
             url: url.format({
-              protocol: client.protocol,
-              host: client.host,
+              protocol: this.client.protocol,
+              host: this.client.host,
               pathname: this.pathname,
               query: options.query
             }),
@@ -801,8 +800,8 @@ export default class CacheStore extends NetworkStore {
             const saveRequest = new CacheRequest({
               method: RequestMethod.PUT,
               url: url.format({
-                protocol: client.protocol,
-                host: client.host,
+                protocol: this.client.protocol,
+                host: this.client.host,
                 pathname: this.pathname,
                 query: options.query
               }),

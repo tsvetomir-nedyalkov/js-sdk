@@ -1,5 +1,5 @@
 import { NoResponseError, KinveyError } from '../../errors';
-import client from '../../client';
+import { Client } from '../../client';
 import { isDefined } from '../../utils';
 import Response from './response';
 import Headers from './headers';
@@ -32,14 +32,29 @@ export default class Request {
       followRedirect: true
     }, options);
 
+    this.client = options.client;
     this.method = options.method || RequestMethod.GET;
     this.headers = options.headers || new Headers();
     this.url = options.url || '';
     this.body = options.body || options.data;
-    this.timeout = isDefined(options.timeout) ? options.timeout : client.defaultTimeout;
+    this.timeout = isDefined(options.timeout) ? options.timeout : this.client.defaultTimeout;
     this.followRedirect = options.followRedirect === true;
     this.cache = options.cache === true;
     this.executing = false;
+  }
+
+  get client() {
+    return this._client || Client.sharedInstance();
+  }
+
+  set client(client) {
+    if (client) {
+      if (!(client instanceof Client)) {
+        throw new KinveyError('client must be an instance of the Client class.');
+      }
+    }
+
+    this._client = client;
   }
 
   get method() {

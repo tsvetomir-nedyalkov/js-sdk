@@ -1,5 +1,5 @@
 import Request, { RequestMethod } from './request';
-import client from '../../client';
+import { Client } from '../../client';
 import { KinveyResponse } from './response';
 import UrlPattern from 'url-pattern';
 import url from 'url';
@@ -99,13 +99,13 @@ export default class LocalRequest extends Request {
     obj.appKey = this.appKey;
     obj.collection = this.collection;
     obj.entityId = this.entityId;
-    obj.encryptionKey = client.encryptionKey;
+    obj.encryptionKey = this.client ? this.client.encryptionKey : undefined;
     return obj;
   }
 
   static activeUsers = {};
 
-  static loadActiveUser() {
+  static loadActiveUser(client = Client.sharedInstance()) {
     const request = new LocalRequest({
       method: RequestMethod.GET,
       url: url.format({
@@ -127,15 +127,15 @@ export default class LocalRequest extends Request {
       .catch(() => null);
   }
 
-  static loadActiveUserLegacy() {
+  static loadActiveUserLegacy(client = Client.sharedInstance()) {
     return LocalRequest.getActiveUserLegacy(client);
   }
 
-  static getActiveUser() {
+  static getActiveUser(client = Client.sharedInstance()) {
     return LocalRequest.activeUsers[client.appKey];
   }
 
-  static getActiveUserLegacy() {
+  static getActiveUserLegacy(client = Client.sharedInstance()) {
     try {
       return localStorage.get(`${client.appKey}kinvey_user`);
     } catch (error) {
@@ -143,7 +143,7 @@ export default class LocalRequest extends Request {
     }
   }
 
-  static setActiveUser(user) {
+  static setActiveUser(client = Client.sharedInstance(), user) {
     let promise = Promise.resolve(null);
     const activeUser = LocalRequest.getActiveUser(client);
 
@@ -195,7 +195,7 @@ export default class LocalRequest extends Request {
       .then(() => user);
   }
 
-  static setActiveUserLegacy(user) {
+  static setActiveUserLegacy(client = Client.sharedInstance(), user) {
     try {
       localStorage.remove(`${client.appKey}kinvey_user`);
 
