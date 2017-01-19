@@ -12,7 +12,6 @@ import { isDefined } from '../../utils';
 import { CacheRack } from './rack';
 const usersNamespace = process.env.KINVEY_USERS_NAMESPACE || 'user';
 const activeUserCollectionName = process.env.KINVEY_USER_ACTIVE_COLLECTION_NAME || 'kinvey_active_user';
-const activeUsers = {};
 
 /**
  * @private
@@ -104,6 +103,8 @@ export default class LocalRequest extends Request {
     return obj;
   }
 
+  static activeUsers = {};
+
   static loadActiveUser(client = Client.sharedInstance()) {
     const request = new LocalRequest({
       method: RequestMethod.GET,
@@ -121,28 +122,17 @@ export default class LocalRequest extends Request {
         }
 
         // Try local storage (legacy)
-        const legacyActiveUser = LocalRequest.loadActiveUserLegacy(client);
-        if (isDefined(legacyActiveUser)) {
-          return LocalRequest.setActiveUser(client, legacyActiveUser);
-        }
-
-        return null;
-      })
-      .then((activeUser) => {
-        activeUsers[client.appKey] = activeUser;
-        return activeUser;
+        return LocalRequest.loadActiveUserLegacy(client);
       })
       .catch(() => null);
   }
 
   static loadActiveUserLegacy(client = Client.sharedInstance()) {
-    const activeUser = LocalRequest.getActiveUserLegacy(client);
-    activeUsers[client.appKey] = activeUser;
-    return activeUser;
+    return LocalRequest.getActiveUserLegacy(client);
   }
 
   static getActiveUser(client = Client.sharedInstance()) {
-    return activeUsers[client.appKey];
+    return LocalRequest.activeUsers[client.appKey];
   }
 
   static getActiveUserLegacy(client = Client.sharedInstance()) {
@@ -162,7 +152,7 @@ export default class LocalRequest extends Request {
       LocalRequest.setActiveUserLegacy(client, null);
 
       // Delete from memory
-      activeUsers[client.appKey] = null;
+      LocalRequest.activeUsers[client.appKey] = null;
 
       // Delete from cache
       const request = new LocalRequest({
@@ -184,7 +174,7 @@ export default class LocalRequest extends Request {
         }
 
         // Save to memory
-        activeUsers[client.appKey] = user;
+        LocalRequest.activeUsers[client.appKey] = user;
 
         // Save to local storage (legacy)
         LocalRequest.setActiveUserLegacy(client, user);
