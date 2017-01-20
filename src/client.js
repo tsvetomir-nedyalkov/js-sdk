@@ -270,7 +270,7 @@ export class Client {
     }
   }
 
-  setActiveUser(activeUser) {
+  setActiveUser(user) {
     let promise = Promise.resolve(null);
 
     if (isDefined(this.activeUser)) {
@@ -295,15 +295,15 @@ export class Client {
 
     return promise
       .then(() => {
-        if (isDefined(activeUser) === false) {
+        if (isDefined(user) === false) {
           return null;
         }
 
         // Save to memory
-        this._activeUser = activeUser;
+        this._activeUser = user;
 
         // Save to local storage (legacy)
-        this.setActiveUserLegacy(activeUser);
+        this.setActiveUserLegacy(user);
 
         // Save to cache
         const request = new CacheRequest({
@@ -313,20 +313,20 @@ export class Client {
             host: this.host,
             pathname: `/${usersNamespace}/${this.appKey}/${activeUserCollectionName}`
           }),
-          body: activeUser
+          body: user
         });
         return request.execute()
           .then(response => response.data);
       })
-      .then(() => activeUser);
+      .then(() => user);
   }
 
-  setActiveUserLegacy(activeUser) {
+  setActiveUserLegacy(user) {
     try {
       localStorage.remove(`${this.appKey}kinvey_user`);
 
-      if (isDefined(activeUser)) {
-        localStorage.set(`${this.appKey}kinvey_user`, activeUser);
+      if (isDefined(user)) {
+        localStorage.set(`${this.appKey}kinvey_user`, user);
       }
 
       return true;
