@@ -210,6 +210,7 @@ class Kinvey {
 Kinvey.Acl = Acl;
 Kinvey.Aggregation = Aggregation;
 Kinvey.AuthorizationGrant = AuthorizationGrant;
+Kinvey.Client = Client;
 Kinvey.CustomEndpoint = CustomEndpoint;
 Kinvey.DataStore = DataStore;
 Kinvey.DataStoreType = DataStoreType;
