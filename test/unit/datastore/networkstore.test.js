@@ -9,16 +9,6 @@ import expect from 'expect';
 const collection = 'Books';
 
 describe('NetworkStore', function() {
-  // Get the sared client instance
-  before(function() {
-    this.client = Client.sharedInstance();
-  });
-
-  // Cleanup
-  after(function() {
-    delete this.client;
-  });
-
   describe('pathname', function() {
     it(`should equal /appdata/<appkey>/${collection}`, function() {
       const store = new NetworkStore(collection);

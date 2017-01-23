@@ -9,16 +9,6 @@ import url from 'url';
 const redirectUri = 'http://localhost:3000';
 
 describe('MobileIdentityConnect', function() {
-  // Get the shared client instance
-  before(function() {
-    this.client = Client.sharedInstance();
-  });
-
-  // Cleanup
-  after(function() {
-    delete this.client;
-  });
-
   describe('identity', function() {
     it('should return MobileIdentityConnect', function() {
       expect(MobileIdentityConnect.identity).toEqual('kinveyAuth');

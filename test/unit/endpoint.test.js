@@ -5,16 +5,6 @@ import nock from 'nock';
 import expect from 'expect';
 
 describe('Endpoint', function() {
-  // Get the shared client instance
-  before(function() {
-    this.client = Client.sharedInstance();
-  });
-
-  // Cleanup
-  after(function() {
-    delete this.client;
-  });
-
   describe('constructor', function() {
     it('should not be able to create an instance of the CustomEndpoint class', function() {
       expect(() => {

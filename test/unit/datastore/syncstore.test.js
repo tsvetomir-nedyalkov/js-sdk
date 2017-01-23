@@ -8,16 +8,6 @@ import expect from 'expect';
 const collection = 'Books';
 
 describe('SyncStore', function() {
-  // Get the sared client instance
-  before(function() {
-    this.client = Client.sharedInstance();
-  });
-
-  // Cleanup
-  after(function() {
-    delete this.client;
-  });
-
   describe('pathname', function() {
     it(`should equal /appdata/<appkey>/${collection}`, function() {
       const store = new SyncStore(collection);
@@ -121,7 +111,7 @@ describe('SyncStore', function() {
       const store = new SyncStore(collection);
       const query = new Query();
       query.limit = 1;
-      const entities = await store.find(query).toPromise();    
+      const entities = await store.find(query).toPromise();
       expect(entities.length).toEqual(1);
       expect(entities).toEqual([entity1]);
     });
@@ -147,7 +137,7 @@ describe('SyncStore', function() {
       const query = new Query();
       query.ascending('isbn');
       query.descending('summary');
-      const entities = await store.find(query).toPromise();    
+      const entities = await store.find(query).toPromise();
       expect(entities).toEqual([entity3, entity2, entity1]);
     });
 
