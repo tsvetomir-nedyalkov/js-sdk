@@ -394,78 +394,94 @@ export class KinveyRequest extends NetworkRequest {
       })
       .catch((error) => {
         if (error instanceof InvalidCredentialsError && retry === true) {
-          return this.client.loadActiveUser()
-            .then((activeUser) => {
-              const activeUser = this.client.activeUser;
-            })
-
-          if (!isDefined(activeUser)) {
+          if (isDefined(this.client.activeUser) === false) {
             throw error;
           }
 
-          const socialIdentities = isDefined(activeUser._socialIdentity) ? activeUser._socialIdentity : {};
-          const sessionKey = Object.keys(socialIdentities)
-            .find(sessionKey => socialIdentities[sessionKey].identity === SocialIdentity.MobileIdentityConnect);
-          const session = socialIdentities[sessionKey];
+          return this.client.loadActiveUser()
+            .then((storedActiveUser) => {
+              if (isDefined(storedActiveUser) === false) {
+                throw error;
+              }
 
-          if (isDefined(session)) {
-            // Refresh MIC Token
-            if (session.identity === SocialIdentity.MobileIdentityConnect) {
-              const refreshMICRequest = new KinveyRequest({
+              const socialIdentities = isDefined(storedActiveUser._socialIdentity)
+                ? storedActiveUser._socialIdentity : {};
+              const sessionKey = Object.keys(socialIdentities)
+                .find(sessionKey => socialIdentities[sessionKey].identity === SocialIdentity.MobileIdentityConnect);
+              const session = socialIdentities[sessionKey];
+
+              if (this.client.activeUser._kmd.authtoken === storedActiveUser._kmd.authtoken) {
+                if (isDefined(session)) {
+                  // Refresh MIC Token and attempt the request again
+                  if (session.identity === SocialIdentity.MobileIdentityConnect) {
+                    const refreshMICRequest = new KinveyRequest({
+                      method: RequestMethod.POST,
+                      headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                      },
+                      authType: AuthType.App,
+                      url: url.format({
+                        protocol: session.protocol || this.client.micProtocol,
+                        host: session.host || this.client.micHost,
+                        pathname: tokenPathname
+                      }),
+                      body: {
+                        grant_type: 'refresh_token',
+                        client_id: session.client_id,
+                        redirect_uri: session.redirect_uri,
+                        refresh_token: session.refresh_token
+                      },
+                      timeout: this.timeout,
+                      properties: this.properties
+                    });
+
+                    return refreshMICRequest.execute()
+                      .then(response => response.data)
+                      .then((newSession) => {
+                        newSession.identity = session.identity;
+                        newSession.client_id = session.client_id;
+                        newSession.redirect_uri = session.redirect_uri;
+                        newSession.protocol = session.protocol;
+                        newSession.host = session.host;
+                      });
+                  }
+                }
+              }
+
+              return session;
+            })
+            .then((session) => {
+              if (isDefined(session) === false) {
+                throw error;
+              }
+
+              // Login the user with the new mic session
+              const data = {};
+              data._socialIdentity = {};
+              data._socialIdentity[session.identity] = session;
+
+              // Login the user
+              const loginRequest = new KinveyRequest({
                 method: RequestMethod.POST,
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                },
                 authType: AuthType.App,
                 url: url.format({
-                  protocol: session.protocol || this.client.micProtocol,
-                  host: session.host || this.client.micHost,
-                  pathname: tokenPathname
+                  protocol: this.client.protocol,
+                  host: this.client.host,
+                  pathname: `/${usersNamespace}/${this.client.appKey}/login`
                 }),
-                body: {
-                  grant_type: 'refresh_token',
-                  client_id: session.client_id,
-                  redirect_uri: session.redirect_uri,
-                  refresh_token: session.refresh_token
-                },
+                properties: this.properties,
+                body: data,
                 timeout: this.timeout,
-                properties: this.properties
+                client: this.client
               });
-
-              return refreshMICRequest.execute()
+              return loginRequest.execute()
                 .then(response => response.data)
-                .then((newSession) => {
-                  // Login the user with the new mic session
-                  const data = {};
-                  data._socialIdentity = {};
-                  data._socialIdentity[session.identity] = newSession;
-
-                  // Login the user
-                  const loginRequest = new KinveyRequest({
-                    method: RequestMethod.POST,
-                    authType: AuthType.App,
-                    url: url.format({
-                      protocol: this.client.protocol,
-                      host: this.client.host,
-                      pathname: `/${usersNamespace}/${this.client.appKey}/login`
-                    }),
-                    properties: this.properties,
-                    body: data,
-                    timeout: this.timeout,
-                    client: this.client
-                  });
-                  return loginRequest.execute()
-                    .then(response => response.data);
-                })
                 .then((user) => {
                   user._socialIdentity[session.identity] = defaults(user._socialIdentity[session.identity], session);
                   return this.client.setActiveUser(user);
                 })
                 .then(() => this.execute(rawResponse, false));
-            }
-          }
-
-          throw error;
+            });
         }
 
         throw error;
