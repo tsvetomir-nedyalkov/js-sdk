@@ -50,7 +50,7 @@ export default class SyncManager {
     /**
      * @type {Client}
      */
-    this.client = options.client || Client.sharedInstance();
+    this.client = options.client || Client.sharedInstance;
   }
 
   /**

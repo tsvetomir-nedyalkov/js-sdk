@@ -45,7 +45,7 @@ export default class NetworkStore {
       return this._client;
     }
 
-    return Client.sharedInstance();
+    return Client.sharedInstance;
   }
 
   /**

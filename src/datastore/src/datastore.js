@@ -74,7 +74,7 @@ export default class DataStore {
    * @return {Promise<Object>} The result of clearing the cache.
    */
   static clearCache(options = {}) {
-    const client = options.client || Client.sharedInstance();
+    const client = options.client || Client.sharedInstance;
     const pathname = `/${appdataNamespace}/${client.appKey}`;
     const request = new CacheRequest({
       method: RequestMethod.DELETE,

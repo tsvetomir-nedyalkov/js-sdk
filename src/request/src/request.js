@@ -44,7 +44,7 @@ export default class Request {
   }
 
   get client() {
-    return this._client || Client.sharedInstance();
+    return this._client || Client.sharedInstance;
   }
 
   set client(client) {

@@ -394,7 +394,10 @@ export class KinveyRequest extends NetworkRequest {
       })
       .catch((error) => {
         if (error instanceof InvalidCredentialsError && retry === true) {
-          const activeUser = this.client.activeUser;
+          return this.client.loadActiveUser()
+            .then((activeUser) => {
+              const activeUser = this.client.activeUser;
+            })
 
           if (!isDefined(activeUser)) {
             throw error;

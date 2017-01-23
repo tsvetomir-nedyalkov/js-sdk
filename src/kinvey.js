@@ -49,7 +49,7 @@ class Kinvey {
    * var client = Kinvey.client;
    */
   static get client() {
-    return Client.sharedInstance();
+    return Client.sharedInstance;
   }
 
   /**
@@ -190,7 +190,7 @@ class Kinvey {
    *   console.log('Kinvey Ping Failed. Response: ' + error.description);
    * });
    */
-  static ping(client = Client.sharedInstance()) {
+  static ping(client = Client.sharedInstance) {
     const request = new KinveyRequest({
       method: RequestMethod.GET,
       authType: AuthType.All,

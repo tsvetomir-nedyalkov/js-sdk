@@ -47,7 +47,7 @@ export default class User {
      *
      * @type {Client}
      */
-    this.client = options.client || Client.sharedInstance();
+    this.client = options.client || Client.sharedInstance;
   }
 
   /**
@@ -781,7 +781,7 @@ export default class User {
       return Promise.reject(new KinveyError('The provided username is not a string.'));
     }
 
-    const client = options.client || Client.sharedInstance();
+    const client = options.client || Client.sharedInstance;
     const request = new KinveyRequest({
       method: RequestMethod.POST,
       authType: AuthType.App,
@@ -817,7 +817,7 @@ export default class User {
       return Promise.reject(new KinveyError('The provided email is not a string.'));
     }
 
-    const client = options.client || Client.sharedInstance();
+    const client = options.client || Client.sharedInstance;
     const request = new KinveyRequest({
       method: RequestMethod.POST,
       authType: AuthType.App,
@@ -854,7 +854,7 @@ export default class User {
       return Promise.reject(new KinveyError('The provided username is not a string.'));
     }
 
-    const client = options.client || Client.sharedInstance();
+    const client = options.client || Client.sharedInstance;
     const request = new KinveyRequest({
       method: RequestMethod.POST,
       authType: AuthType.App,
@@ -909,10 +909,10 @@ export default class User {
    *
    * @deprecated Please use `User.loadActiveUser()`.
    *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
+   * @param {Client} [client=Client.sharedInstance] Client to use to load the active user.
    * @return {?User} The active user.
    */
-  static loadActiveUserLegacy(client = Client.sharedInstance()) {
+  static loadActiveUserLegacy(client = Client.sharedInstance) {
     const activeUserData = client.loadActiveUserLegacy();
 
     if (isDefined(activeUserData)) {
@@ -925,10 +925,10 @@ export default class User {
   /**
    * Loads the active user.
    *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to load the active user.
+   * @param {Client} [client=Client.sharedInstance] Client to use to load the active user.
    * @return {?User} The active user.
    */
-  static loadActiveUser(client = Client.sharedInstance()) {
+  static loadActiveUser(client = Client.sharedInstance) {
     return client.loadActiveUser()
       .then((activeUserData) => {
         if (isDefined(activeUserData)) {
@@ -960,10 +960,10 @@ export default class User {
    * Gets the active user. You can optionally provide a client
    * to use to lookup the active user.
    *
-   * @param {Client} [client=Client.sharedInstance()] Client to use to lookup active user.
+   * @param {Client} [client=Client.sharedInstance] Client to use to lookup active user.
    * @return {?User} The active user.
    */
-  static getActiveUser(client = Client.sharedInstance()) {
+  static getActiveUser(client = Client.sharedInstance) {
     const data = client.activeUser;
 
     if (isDefined(data)) {

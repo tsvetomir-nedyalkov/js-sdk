@@ -10,7 +10,6 @@ import isNumber from 'lodash/isNumber';
 const usersNamespace = process.env.KINVEY_USERS_NAMESPACE || 'user';
 const activeUserCollectionName = process.env.KINVEY_USER_ACTIVE_COLLECTION_NAME || 'kinvey_active_user';
 const defaultTimeout = process.env.KINVEY_DEFAULT_TIMEOUT || 60000;
-let sharedInstance = null;
 
 /**
  * The Client class stores information about your application on the Kinvey platform. You can create mutiple clients
@@ -381,11 +380,11 @@ export class Client {
    *   appKey: '<appKey>',
    *   appSecret: '<appSecret>'
    * });
-   * Kinvey.Client.sharedInstance() === client; // true
+   * Kinvey.Client.sharedInstance === client; // true
    */
   static init(options) {
-    const client = new Client(options);
-    sharedInstance = client;
+    const client = new this(options);
+    this._sharedInstance = client;
     return client;
   }
 
@@ -405,8 +404,8 @@ export class Client {
    * @return {Promise}                                                     A promise.
    */
   static initialize(options) {
-    const client = new Client(options);
-    sharedInstance = client;
+    const client = new this(options);
+    this._sharedInstance = client;
     return client;
   }
 
@@ -418,14 +417,14 @@ export class Client {
    * @return {Client} The shared instance.
    *
    * @example
-   * var client = Kinvey.Client.sharedInstance();
+   * var client = Kinvey.Client.sharedInstance;
    */
-  static sharedInstance() {
-    if (!sharedInstance) {
+  static get sharedInstance() {
+    if (isDefined(this._sharedInstance) === false) {
       throw new KinveyError('You have not initialized the library. ' +
         'Please call Kinvey.init() to initialize the library.');
     }
 
-    return sharedInstance;
+    return this._sharedInstance;
   }
 }

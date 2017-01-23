@@ -33,7 +33,7 @@ export class CustomEndpoint {
    * });
    */
   static execute(endpoint, args, options = {}) {
-    const client = options.client || Client.sharedInstance();
+    const client = options.client || Client.sharedInstance;
 
     if (!endpoint) {
       return Promise.reject(new KinveyError('An endpoint argument is required.'));

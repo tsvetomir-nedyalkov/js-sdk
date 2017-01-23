@@ -14,7 +14,7 @@ if (typeof window !== 'undefined') {
  */
 export default class Identity {
   constructor(options = {}) {
-    this.client = options.client || Client.sharedInstance();
+    this.client = options.client || Client.sharedInstance;
   }
 
   get identity() {
