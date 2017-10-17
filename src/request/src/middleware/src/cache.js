@@ -14,15 +14,21 @@ export default class CacheMiddleware extends Middleware {
   }
 
   handle(request) {
-    const { method, body, appKey, collection, entityId } = request;
+    const { method, body, appKey, collection, entityId, query } = request;
     const storage = this.loadStorage(appKey);
     let promise;
+
+    console.log(`handle: method: ${method}, coll: ${collection}, id: ${entityId}`);
 
     if (method === 'GET') {
       if (isDefined(entityId)) {
         promise = storage.findById(collection, entityId);
       } else {
-        promise = storage.find(collection);
+        promise = storage.find(collection)
+          .then(res => {
+            console.log(`got  ${collection}: ${JSON.stringify(res)}`);
+            return res;
+          });
       }
     } else if (method === 'POST' || method === 'PUT') {
       if (entityId === '_group') {
@@ -33,8 +39,13 @@ export default class CacheMiddleware extends Middleware {
     } else if (method === 'DELETE') {
       if (isDefined(collection) === false) {
         promise = storage.clear();
-      } else {
+      } else if (query) {
+        const idsToRemove = query.filter && query.filter._id && query.filter._id.$in;
+        promise = storage.remove(collection, idsToRemove);
+      } else if (entityId) {
         promise = storage.removeById(collection, entityId);
+      } else {
+        return Promise.reject(new Error('Should not happen')); // TODO: remove
       }
     }
 
@@ -44,6 +55,7 @@ export default class CacheMiddleware extends Middleware {
         data: data
       };
 
+
       if (method === 'POST' && entityId === '_group') {
         response.statusCode = 200;
       }
@@ -52,9 +64,11 @@ export default class CacheMiddleware extends Middleware {
         response.statusCode = 204;
       }
 
+      console.log(`data: ${JSON.stringify(data)}`);
+      console.log(`response: ${JSON.stringify(response)}`);
       return response;
     })
-    .catch(error => ({ statusCode: error.code }))
-    .then(response => ({ response: response }));
+      .catch(error => ({ statusCode: error.code }))
+      .then(response => ({ response: response }));
   }
 }

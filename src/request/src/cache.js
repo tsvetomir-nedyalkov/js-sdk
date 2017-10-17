@@ -1,4 +1,3 @@
-import UrlPattern from 'url-pattern';
 import url from 'url';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -6,7 +5,7 @@ import { KinveyError } from 'src/errors';
 import Query from 'src/query';
 import Aggregation from 'src/aggregation';
 import { isDefined } from 'src/utils';
-import Request from './request';
+import Request, { RequestMethod } from './request';
 import { KinveyResponse } from './response';
 import { CacheRack } from './rack';
 
@@ -85,7 +84,7 @@ export default class CacheRequest extends Request {
         }
 
         // If a query was provided then process the data with the query
-        if (isDefined(this.query) && isDefined(response.data)) {
+        if (isDefined(this.query) && isDefined(response.data) && this.method !== RequestMethod.DELETE) { // TODO: FIX THIS
           response.data = this.query.process(response.data);
         }
 
@@ -105,6 +104,7 @@ export default class CacheRequest extends Request {
     obj.collection = this.collection;
     obj.entityId = this.entityId;
     obj.encryptionKey = this.client ? this.client.encryptionKey : undefined;
+    obj.query = this.query && this.query.toPlainObject();
     return obj;
   }
 }

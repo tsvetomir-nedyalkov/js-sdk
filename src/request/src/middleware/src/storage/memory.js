@@ -88,6 +88,17 @@ class Memory {
       });
   }
 
+  removeIds(collection, entityIds) {
+    return this.find(collection)
+      .then((entities) => {
+        const entitiesToRemoveById = keyBy(entityIds, id => id);
+        const remainingEntities = entities.filter(e => !entitiesToRemoveById[e._id]);
+        const removedCount = entities.length - remainingEntities.length;
+        this.cache.set(collection, JSON.stringify(remainingEntities));
+        return { count: removedCount };
+      });
+  }
+
   removeById(collection, id) {
     return this.find(collection)
       .then((entities) => {

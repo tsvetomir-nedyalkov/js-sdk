@@ -117,19 +117,28 @@ export class Storage {
   }
 
   remove(collection, entities = []) {
-    return Promise.all(entities.map((entity) => {
-      if (!isDefined(entity._id)) {
-        return Promise.reject(new KinveyError('Unable to remove this entity because it does not have _id.'));
-      }
+    let ids = entities;
+    if (typeof entities[0] === 'object') {
+      ids = entities.map(e => e._id);
+    }
+    return queue.add(() => {
+      return this.loadAdapter()
+        .then(adapter => adapter.removeIds(collection, ids));
+    });
 
-      return this.removeById(collection, entity._id);
-    }))
-      .then((results) => {
-        return results.reduce((response, result) => {
-          response.count += result.count;
-          return response;
-        }, { count: 0 });
-      });
+    // return Promise.all(entities.map((entity) => {
+    //   if (!isDefined(entity._id)) {
+    //     return Promise.reject(new KinveyError('Unable to remove this entity because it does not have _id.'));
+    //   }
+
+    //   return this.removeById(collection, entity._id);
+    // }))
+    //   .then((results) => {
+    //     return results.reduce((response, result) => {
+    //       response.count += result.count;
+    //       return response;
+    //     }, { count: 0 });
+    //   });
   }
 
   removeById(collection, id) {

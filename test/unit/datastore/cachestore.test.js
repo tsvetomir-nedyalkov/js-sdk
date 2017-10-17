@@ -67,6 +67,7 @@ describe('CacheStore', function() {
           store.find()
             .subscribe(null, (error) => {
               try {
+                // console.log(error.stack);
                 expect(error).toBeA(KinveyError);
                 expect(error.message).toEqual(
                   'Unable to fetch the entities on the backend.'

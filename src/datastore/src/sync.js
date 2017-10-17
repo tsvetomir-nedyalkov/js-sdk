@@ -73,6 +73,10 @@ export default class SyncManager {
     return `/appdata/${this.client.appKey}/${this.collection}`;
   }
 
+  findWithEntities(options, entities) {
+    return this._getQueuedOperationsForEntities(options, entities);
+  }
+
   find(query, options = {}) {
     if (isDefined(query) && (query instanceof Query) === false) {
       query = new Query(result(query, 'toJSON', query));
@@ -90,31 +94,37 @@ export default class SyncManager {
       timeout: options.timeout,
       client: this.client
     });
+
     return request.execute()
-      .then(response => response.data)
-      .then((entities) => {
-        const syncQuery = new Query();
-        syncQuery.equalTo('collection', this.collection);
-
-        if (isDefined(query)) {
-          syncQuery.contains('entityId', map(entities, entity => entity._id));
-        }
-
-        const request = new CacheRequest({
-          method: RequestMethod.GET,
-          url: url.format({
-            protocol: this.client.apiProtocol,
-            host: this.client.apiHost,
-            pathname: this.pathname
-          }),
-          properties: options.properties,
-          query: syncQuery,
-          timeout: options.timeout,
-          client: this.client
-        });
-        return request.execute()
-          .then(response => response.data);
+      .then(response => {
+        console.log('resppp: ' + JSON.stringify(response));
+        return this._getQueuedOperationsForEntities(options, response.data);
       });
+  }
+
+  _getQueuedOperationsForEntities(options, entities) {
+    const syncQuery = new Query();
+    syncQuery.equalTo('collection', this.collection);
+
+    if (entities) {
+      syncQuery.contains('entityId', map(entities, e => e._id));
+    }
+
+    const request = new CacheRequest({
+      method: RequestMethod.GET,
+      url: url.format({
+        protocol: this.client.apiProtocol,
+        host: this.client.apiHost,
+        pathname: this.pathname
+      }),
+      properties: options.properties,
+      query: syncQuery,
+      timeout: options.timeout,
+      client: this.client
+    });
+
+    return request.execute()
+      .then(response => response.data);
   }
 
   /**
@@ -128,7 +138,15 @@ export default class SyncManager {
    */
   count(query, options = {}) {
     return this.find(query, options)
-      .then(entities => entities.length);
+      .then(entities => {
+        console.log(`count: ${entities.length} - - - ${JSON.stringify(entities)}`);
+        return entities.length;
+      });
+  }
+
+  countWithEntities(options, entities) {
+    return this.findWithEntities(options, entities)
+      .then(d => d.length);
   }
 
   addCreateOperation(entities, options = {}) {
@@ -216,6 +234,17 @@ export default class SyncManager {
     });
   }
 
+  pullWithEntities(query, options, cachedEntities) {
+    return this.countWithEntities(options, cachedEntities)
+      .then((count) => {
+        if (count > 0) {
+          return this.push(query, options);
+        }
+        return count;
+      })
+      .then(() => this._fetchNetworkEntities(query, options));
+  }
+
   pull(query, options = {}) {
     // Check that the query is valid
     if (query && !(query instanceof Query)) {
@@ -240,31 +269,34 @@ export default class SyncManager {
             + ' to be synced before data is loaded from the network.');
         }
 
+        return this._fetchNetworkEntities(query, options);
+      });
+  }
 
-        const config = {
-          method: RequestMethod.GET,
-          authType: AuthType.Default,
-          url: url.format({
-            protocol: this.client.apiProtocol,
-            host: this.client.apiHost,
-            pathname: this.backendPathname
-          }),
-          properties: options.properties,
-          query: query,
-          timeout: options.timeout,
-          client: this.client
-        };
-        let request = new KinveyRequest(config);
+  _fetchNetworkEntities(query, options) {
+    const config = {
+      method: RequestMethod.GET,
+      authType: AuthType.Default,
+      url: url.format({
+        protocol: this.client.apiProtocol,
+        host: this.client.apiHost,
+        pathname: this.backendPathname
+      }),
+      properties: options.properties,
+      query: query,
+      timeout: options.timeout,
+      client: this.client
+    };
+    let request = new KinveyRequest(config);
 
-        // Should we use delta fetch?
-        if (options.useDeltaFetch === true) {
-          request = new DeltaFetchRequest(config);
-        }
+    // Should we use delta fetch?
+    if (options.useDeltaFetch === true) {
+      request = new DeltaFetchRequest(config);
+    }
 
-        // Execute the request
-        return request.execute();
-      })
-      .then(response => response.data);
+    // Execute the request
+    return request.execute()
+      .then(r => r.data);
   }
 
   /*
