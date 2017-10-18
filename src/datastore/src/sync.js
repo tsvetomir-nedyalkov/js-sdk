@@ -96,17 +96,14 @@ export default class SyncManager {
     });
 
     return request.execute()
-      .then(response => {
-        console.log('resppp: ' + JSON.stringify(response));
-        return this._getQueuedOperationsForEntities(options, response.data);
-      });
+      .then(response => this._getQueuedOperationsForEntities(options, response.data, !query));
   }
 
-  _getQueuedOperationsForEntities(options, entities) {
+  _getQueuedOperationsForEntities(options, entities, getAll = false) {
     const syncQuery = new Query();
     syncQuery.equalTo('collection', this.collection);
 
-    if (entities) {
+    if (!getAll) {
       syncQuery.contains('entityId', map(entities, e => e._id));
     }
 
@@ -138,10 +135,7 @@ export default class SyncManager {
    */
   count(query, options = {}) {
     return this.find(query, options)
-      .then(entities => {
-        console.log(`count: ${entities.length} - - - ${JSON.stringify(entities)}`);
-        return entities.length;
-      });
+      .then(entities => entities.length);
   }
 
   countWithEntities(options, entities) {

@@ -422,7 +422,7 @@ describe('SyncStore', function() {
         });
     });
 
-    it.only('should remove all the entities', function() {
+    it('should remove all the entities', function() {
       const store = new SyncStore(collection);
       const entity1 = { _id: randomString() };
       const entity2 = { _id: randomString() };

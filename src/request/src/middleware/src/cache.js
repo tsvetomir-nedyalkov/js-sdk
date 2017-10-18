@@ -18,17 +18,11 @@ export default class CacheMiddleware extends Middleware {
     const storage = this.loadStorage(appKey);
     let promise;
 
-    console.log(`handle: method: ${method}, coll: ${collection}, id: ${entityId}`);
-
     if (method === 'GET') {
       if (isDefined(entityId)) {
         promise = storage.findById(collection, entityId);
       } else {
-        promise = storage.find(collection)
-          .then(res => {
-            console.log(`got  ${collection}: ${JSON.stringify(res)}`);
-            return res;
-          });
+        promise = storage.find(collection);
       }
     } else if (method === 'POST' || method === 'PUT') {
       if (entityId === '_group') {
@@ -64,8 +58,6 @@ export default class CacheMiddleware extends Middleware {
         response.statusCode = 204;
       }
 
-      console.log(`data: ${JSON.stringify(data)}`);
-      console.log(`response: ${JSON.stringify(response)}`);
       return response;
     })
       .catch(error => ({ statusCode: error.code }))
