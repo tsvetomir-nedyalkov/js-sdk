@@ -108,7 +108,7 @@ export default class CacheStore extends NetworkStore {
               .then((networkEntities) => {
                 // Remove entities from the cache that no longer exists
                 const removedEntities = differenceBy(cacheEntities, networkEntities, '_id');
-                const removedIds = Object.keys(keyBy(removedEntities, '_id'));
+                const removedIds = removedEntities.map(e => e._id);
                 const removeQuery = new Query().contains('_id', removedIds);
                 return this.clear(removeQuery, options)
                   .then(() => networkEntities);
@@ -787,27 +787,12 @@ export default class CacheStore extends NetworkStore {
           if (metadata.isLocal()) {
             const query = new Query();
             query.equalTo('_id', entity._id);
-            return this.clearSync(query, options)
-              .then(() => entity);
+            return this.clearSync(query, options);
           }
-
-          return entity;
+          return Promise.resolve();
         });
     }))
-      .then((/* entity */) => {
-        // Remove from cache
-        // const request = new CacheRequest({
-        //   method: RequestMethod.DELETE,
-        //   url: url.format({
-        //     protocol: this.client.apiProtocol,
-        //     host: this.client.apiHost,
-        //     pathname: `${this.pathname}/${entity._id}`
-        //   }),
-        //   properties: options.properties,
-        //   authType: AuthType.Default,
-        //   timeout: options.timeout
-        // });
-
+      .then(() => {
         // TODO: figure out how to do this
         const query = new Query();
         query.contains('_id', ids);
@@ -828,12 +813,6 @@ export default class CacheStore extends NetworkStore {
         return request.execute()
           .then(response => response.data);
       });
-    // .then((results) => {
-    //   return reduce(results, (totalResult, result) => {
-    //     totalResult.count += result.count;
-    //     return totalResult;
-    //   }, { count: 0 });
-    // });
   }
 
   /**
@@ -885,7 +864,6 @@ export default class CacheStore extends NetworkStore {
    */
   pull(query, options = {}) {
     options = assign({ useDeltaFetch: this.useDeltaFetch }, options);
-    // return this.syncManager.pull(query, options)
     const request = new CacheRequest({
       method: RequestMethod.GET,
       url: url.format({
@@ -906,7 +884,6 @@ export default class CacheStore extends NetworkStore {
       })
       .then((networkEntities) => {
         // Clear the cache
-        // return this.clear(query, options)
         return this.clearWithEntities(options, cacheEntities)
           .then(() => {
             // Save network entities to cache

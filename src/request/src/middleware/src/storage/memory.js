@@ -91,6 +91,7 @@ class Memory {
   removeIds(collection, entityIds) {
     return this.find(collection)
       .then((entities) => {
+        // { id: id } type objects, indicate if id should be removed (cause of truthy value)
         const entitiesToRemoveById = keyBy(entityIds, id => id);
         const remainingEntities = entities.filter(e => !entitiesToRemoveById[e._id]);
         const removedCount = entities.length - remainingEntities.length;

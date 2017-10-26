@@ -74,7 +74,7 @@ export default class SyncManager {
   }
 
   findWithEntities(options, entities) {
-    return this._getQueuedOperationsForEntities(options, entities);
+    return this._getQueuedOperations(options, entities);
   }
 
   find(query, options = {}) {
@@ -96,14 +96,17 @@ export default class SyncManager {
     });
 
     return request.execute()
-      .then(response => this._getQueuedOperationsForEntities(options, response.data, !query));
+      .then((response) => {
+        const entitiesFilter = query ? response.data : null;
+        return this._getQueuedOperations(options, entitiesFilter);
+      });
   }
 
-  _getQueuedOperationsForEntities(options, entities, getAll = false) {
+  _getQueuedOperations(options, entities) {
     const syncQuery = new Query();
     syncQuery.equalTo('collection', this.collection);
 
-    if (!getAll) {
+    if (entities) {
       syncQuery.contains('entityId', map(entities, e => e._id));
     }
 
