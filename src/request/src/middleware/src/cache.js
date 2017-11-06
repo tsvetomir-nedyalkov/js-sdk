@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 
 import { isDefined } from 'src/utils';
+import Client from '../../../../client';
 import Middleware from './middleware';
 import { Storage } from './storage';
 
@@ -9,8 +10,9 @@ export default class CacheMiddleware extends Middleware {
     super(name);
   }
 
-  loadStorage(name) {
-    return new Storage(name);
+  loadStorage(name, /* encryptionKey?? */) {
+    const persistanceType = Client.sharedInstance().persistanceType;
+    return new Storage(name, persistanceType);
   }
 
   handle(request) {

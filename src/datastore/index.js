@@ -5,6 +5,7 @@ import NetworkStore from './src/networkstore';
 import SyncStore from './src/syncstore';
 import UserStore from './src/userstore';
 import { SyncOperation } from './src/sync';
+import { PersistanceType } from './src/persistance-type';
 
 // Export
 export {
@@ -14,7 +15,8 @@ export {
   NetworkStore,
   SyncOperation,
   SyncStore,
-  UserStore
+  UserStore,
+  PersistanceType
 };
 
 // Export default

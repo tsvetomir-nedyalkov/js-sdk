@@ -56,6 +56,7 @@ export default class Client {
    * @param {string}    [options.masterSecret]                             App Master Secret
    * @param {string}    [options.encryptionKey]                            App Encryption Key
    * @param {string}    [options.appVersion]                               App Version
+   * @param {string}    [options.persistanceType]                          Persistance type - LocalStorage, SQLite, etc
    * @return {Client}                                                      An instance of the Client class.
    *
    * @example
@@ -140,6 +141,7 @@ export default class Client {
      */
     this.activeUserStorage = new ActiveUserStorage();
 
+    this.persistanceType = config.persistanceType;
   }
 
   /**
@@ -243,7 +245,7 @@ export default class Client {
    * Initializes the Client class by creating a new instance of the
    * Client class and storing it as a shared instance. The returned promise
    * resolves with the shared instance of the Client class.
-   *
+   * @deprecated Use Client.init().
    * @param {Object}    options                                            Options
    * @param {string}    [options.apiHostname='https://baas.kinvey.com']    Host name used for Kinvey API requests
    * @param {string}    [options.micHostname='https://auth.kinvey.com']    Host name used for Kinvey MIC requests

@@ -5,6 +5,7 @@ import isArray from 'lodash/isArray';
 import { isDefined, Queue, Log } from 'src/utils';
 import { KinveyError, NotFoundError } from 'src/errors';
 import { MemoryAdapter } from './memory';
+import { PersistanceType } from '../../../../../datastore/src/persistance-type';
 
 const queue = new Queue(1, Infinity);
 
@@ -13,7 +14,7 @@ export {
 };
 
 export class Storage {
-  constructor(name) {
+  constructor(name, persistanceType) {
     if (!name) {
       throw new KinveyError('Unable to create a Storage instance without a name.');
     }
@@ -23,16 +24,43 @@ export class Storage {
     }
 
     this.name = name;
+    this.persistanceType = persistanceType;
+    this._supportedAdaptersMap = {};
+    this._registerSupportedAdapter(PersistanceType.Memory, MemoryAdapter);
+  }
+
+  /**
+   * @protected
+   * @param {string} persistanceType
+   * @param {Object} adapter
+   */
+  _registerSupportedAdapter(persistanceType, adapter) {
+    this._supportedAdaptersMap[persistanceType] = adapter;
+  }
+
+  /** @protected */
+  _loadDefaultAdapter() {
+    const memoryAdapter = MemoryAdapter.load(this.name);
+    return Promise.resolve(memoryAdapter);
+  }
+
+  /** @private */
+  _getAdapterIfSupported() {
+    return this._supportedAdaptersMap[this.persistanceType];
   }
 
   loadAdapter() {
-    return Promise.resolve()
-      .then(() => MemoryAdapter.load(this.name))
-      .then((adapter) => {
-        if (!isDefined(adapter)) {
-          return Promise.reject(new KinveyError('Unable to load a storage adapter.'));
-        }
+    if (!this.persistanceType) {
+      return this._loadDefaultAdapter();
+    }
 
+    return this._getAdapterIfSupported()
+      .load(this.name)
+      .then((adapter) => {
+        if (!adapter) {
+          const err = new KinveyError(`Storage adapter ${this.persistanceType} not available for this platform`);
+          return Promise.reject(err);
+        }
         return adapter;
       });
   }

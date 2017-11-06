@@ -8,6 +8,7 @@ import Client from 'src/client';
 import NetworkStore from './networkstore';
 import CacheStore from './cachestore';
 import SyncStore from './syncstore';
+import { PersistanceType } from './persistance-type';
 
 /**
  * @typedef   {Object}    DataStoreType
@@ -91,4 +92,6 @@ export default class DataStore {
     return request.execute()
       .then(response => response.data);
   }
+
+  static Persistance = PersistanceType;
 }
