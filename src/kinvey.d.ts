@@ -1,7 +1,7 @@
 // Type definitions for Kinvey JavaScript SDK
 // Definitions by: Kinvey <https://github.com/Kinvey>
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rx';
 
 export as namespace Kinvey;
 
