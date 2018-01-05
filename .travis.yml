@@ -11,7 +11,7 @@ before_install:
 - android list targets
 
 install:
-- npm install -g cordova
+- npm install -g cordova@7.1.0
     
 before_script:
 - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
@@ -28,7 +28,7 @@ android:
     - tools
     - tools
     - platform-tools
-    - build-tools-26.0.2
+    - build-tools-24
     - android-24
     - extra-android-m2repository
     - extra-google-google_play_services
