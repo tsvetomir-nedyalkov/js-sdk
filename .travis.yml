@@ -11,7 +11,6 @@ before_install:
 
 install:
 - npm install -g cordova
-- npm install
     
 before_script:
 - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
@@ -19,7 +18,7 @@ before_script:
 - android-wait-for-emulator
 
 script:
-- node ./test/platform-config --platform phonegap --os android
+- npm install && node ./test/platform-config --platform phonegap --os android
 
 
 
