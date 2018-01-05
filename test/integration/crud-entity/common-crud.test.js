@@ -78,7 +78,7 @@ function testFunc() {
             storeToTest.count()
               .subscribe(onNextSpy, done, () => {
                 try {
-                  utilities.validateReadResult(dataStoreType, onNextSpy, 3, 4);
+                  utilities.validateReadResult(dataStoreType, onNextSpy, 2, 3);
                   done();
                 } catch (error) {
                   done(error);
