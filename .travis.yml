@@ -11,12 +11,11 @@ before_install:
 
 install:
 - npm install -g cordova
-- android list targets
-- npm i
+- npm install
     
 before_script:
 - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
-- emulator -avd test -no-audio -no-window &
+- emulator -avd test -no-window &
 - android-wait-for-emulator
 
 script:
