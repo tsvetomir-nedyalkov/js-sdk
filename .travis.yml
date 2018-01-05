@@ -25,12 +25,10 @@ script:
 
 android:
   components:
-    - tools
-    - tools
-    - platform-tools
-    - build-tools-26.0.2
+    - tools-24
+    - platform-tools-24
     - build-tools-24
-    - android-26
+    - build-tools-24
     - android-24
     - extra-android-m2repository
     - extra-google-google_play_services
