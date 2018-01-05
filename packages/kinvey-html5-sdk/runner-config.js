@@ -63,8 +63,4 @@ const runner = new Runner({
 runner.on('log.start', port => (logServerPort = port));
 runner.on('serve.static', port => (staticPort = port));
 
-//TODO fix the runner to return exit code 1 if there are failed tests - currently the exit code is always 0
-runner.run().then(() => {
-    console.log('done')
-    process.exit();
-}).catch(err => console.log(err));
+runner.run().then(() => console.log('done')).catch(err => console.log(err));
