@@ -6,7 +6,7 @@ function testFunc() {
   const collectionName = externalConfig.collectionName;
 
   dataStoreTypes.forEach((currentDataStoreType) => {
-    describe(`${currentDataStoreType} Store CRUD Specific Tests`, () => {
+    describe.only(`${currentDataStoreType} Store CRUD Specific Tests`, () => {
 
       let networkStore;
       let syncStore;
