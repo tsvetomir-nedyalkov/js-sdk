@@ -63,4 +63,4 @@ const runner = new Runner({
 runner.on('log.start', port => (logServerPort = port));
 runner.on('serve.static', port => (staticPort = port));
 
-runner.run().then(() => process.exit(1)).catch(err => console.log(err));
+runner.run().then(() => process.exit()).catch(err => console.log(err));
