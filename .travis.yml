@@ -25,13 +25,25 @@ script:
 
 android:
   components:
-    - tools
-    - tools
-    - platform-tools-27.0.0
-    - build-tools-26.0.1
+    # Uncomment the lines below if you want to
+    # use the latest revision of Android SDK Tools
+     - tools
+     - platform-tools
+
+    # The BuildTools version used by your project
+    - build-tools-26.0.2
+
+    # The SDK version used to compile your project
     - android-26
-    - android-24
-    - extra-android-m2repository
+
+    # Additional components
     - extra-google-google_play_services
-    - sys-img-armeabi-v7a-android-24
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - addon-google_apis-google-26
+
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    - sys-img-armeabi-v7a-android-26
+    - sys-img-armeabi-v7a-android-17
 
