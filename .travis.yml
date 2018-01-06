@@ -1,6 +1,5 @@
 os: osx
 env: 
-- BuildiOS="11"
 - Xcode="9.2"
 osx_image: xcode9.2
 language: node_js 
