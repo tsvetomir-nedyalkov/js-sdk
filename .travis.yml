@@ -11,5 +11,9 @@ install:
 - tns usage-reporting disable
 - tns error-reporting disable
 
+before_script:
+- travis_wait travis_retry open -a "iPhone Simulator"
+
 script:
+- echo no | tns device ios
 - npm i && node ./test/platform-config --platform nativescript --os ios
