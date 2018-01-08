@@ -44,7 +44,7 @@ function testFunc() {
       })
   }
 
-  describe('User tests', () => {
+  describe.only('User tests', () => {
 
     const missingCredentialsError = 'Username and/or password missing';
     let createdUserIds = [];
@@ -91,7 +91,7 @@ function testFunc() {
       it('should throw an error if the username is an empty string', (done) => {
         Kinvey.User.login(' ', utilities.randomString())
           .catch((error) => {
-            expect(error.message).to.contain(missingCredentialsError);
+            expect(error.message).to.contain('aaaa');
             done();
           }).catch(done);
       });
