@@ -12,7 +12,7 @@ install:
 - tns error-reporting disable
 
 before_script:
-- travis_wait travis_retry open -a "iPhone Simulator"
+- travis_wait travis_retry open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 
 script:
 - echo no | tns device ios
