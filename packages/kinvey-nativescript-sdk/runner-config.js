@@ -78,6 +78,14 @@ const runner = new Runner({
         }),
         copyTestRunner(appPath),
         runCommand({
+            command: 'adb',
+            args: [
+                'reverse',
+                () => `tcp:${logServerPort}`,
+                () => `tcp:${logServerPort}`
+            ]
+        }),
+        runCommand({
             command: 'tns',
             args: ['run', osName, '--justlaunch'],
             cwd: appRootPath
