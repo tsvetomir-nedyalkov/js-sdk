@@ -8,11 +8,11 @@ jdk: oraclejdk8
 
 
 before_install:
-- tns device
 - nvm install 8.1.0
 
 install:
 - echo no | npm install -g nativescript
+- tns device
 - tns usage-reporting disable
 - tns error-reporting disable
 
