@@ -1,6 +1,6 @@
 os: linux
 language: android
-dist: trusty
+dist: precise
 jdk: oraclejdk8
 
 env: 
@@ -16,12 +16,11 @@ install:
     
 before_script:
 - echo no | android create avd --force -n test -t android-21 -b armeabi-v7a
-- emulator -avd test -no-window &
+- emulator -avd test -no-audio -no-window &
 - android-wait-for-emulator
 
 script:
-- travis_wait node ./test/platform-config --platform phonegap --os android
-
+- node ./test/platform-config --platform phonegap --os android
 
 
 
