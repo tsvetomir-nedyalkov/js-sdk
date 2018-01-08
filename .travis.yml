@@ -8,6 +8,7 @@ jdk: oraclejdk8
 
 
 before_install:
+- tns device
 - nvm install 8.1.0
 
 install:
