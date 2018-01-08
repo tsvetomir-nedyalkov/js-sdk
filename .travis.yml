@@ -15,9 +15,9 @@ install:
 - npm i
     
 before_script:
-- echo no | android create avd --force --name testAVD -t android-25 -b google_apis/armeabi-v7a
+- echo no | android create avd --force --name testAVD -t android-24 -b google_apis/armeabi-v7a
 - emulator -avd testAVD -no-window &
-- travis_wait android-wait-for-emulator
+- android-wait-for-emulator
 
 script:
 - node ./test/platform-config --platform phonegap --os android
@@ -31,7 +31,7 @@ android:
     - platform-tools
     - build-tools-26.0.1
     - android-26
-    - android-25
+    - android-24
     - extra-android-m2repository
     - extra-google-google_play_services
-    - sys-img-armeabi-v7a-google_apis-25
+    - sys-img-armeabi-v7a-google_apis-24
