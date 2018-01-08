@@ -8,7 +8,7 @@ jdk: oraclejdk8
 
 install:
 - echo no | npm install -g nativescript
-- tns device ios
+- echo no | tns device ios
 - tns usage-reporting disable
 - tns error-reporting disable
 
