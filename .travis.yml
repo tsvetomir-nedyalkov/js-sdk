@@ -15,7 +15,7 @@ install:
 - npm i
     
 before_script:
-- echo no | android create avd --force --name testAVD -t android-25 -b google_apis/x86
+- echo no | android create avd --force --name testAVD -t android-25 -b google_apis/armeabi-v7a
 - emulator -avd testAVD -no-window &
 - android-wait-for-emulator
 
@@ -33,4 +33,4 @@ android:
     - android-25
     - extra-android-m2repository
     - extra-google-google_play_services
-    - sys-img-x86-google_apis-25
+    - sys-img-armeabi-v7a-google_apis-25
