@@ -12,8 +12,7 @@ install:
 - tns error-reporting disable
 
 before_script:
-- travis_wait travis_retry open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/Contents/MacOS/Simulator
+- open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app/Contents/MacOS/Simulator
 
 script:
-- echo no | tns device ios
 - npm i && node ./test/platform-config --platform nativescript --os ios
