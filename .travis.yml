@@ -15,7 +15,7 @@ install:
 - npm i
     
 before_script:
-- echo no | android create avd --force --name testAVD -t android-25 -b google_apis/armeabi-v7a
+- echo no | travis_wait android create avd --force --name testAVD -t android-25 -b google_apis/armeabi-v7a
 - emulator -avd testAVD -no-window &
 - android-wait-for-emulator
 
