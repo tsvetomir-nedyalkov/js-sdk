@@ -20,7 +20,7 @@ before_script:
 - android-wait-for-emulator
 
 script:
-- node ./test/platform-config --platform phonegap --os android
+- travis_wait node ./test/platform-config --platform phonegap --os android
 
 
 
