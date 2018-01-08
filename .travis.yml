@@ -15,7 +15,7 @@ install:
 - npm i
     
 before_script:
-- echo no | android create avd --force --name testAVD --abi google_apis/x86 --package 'system-images;android-25;google_apis;x86'
+- echo no | android create avd --force --name testAVD -t android-25 -b google_apis/x86
 - emulator -avd testAVD -no-window &
 - android-wait-for-emulator
 
