@@ -1,6 +1,7 @@
 os: linux
 language: android
-dist: precise
+dist: trusty
+sudo: required
 jdk: oraclejdk8
 
 env: 
