@@ -16,10 +16,12 @@ install:
 - npm i
     
 before_script:
-- echo no | android create avd -n acib -k "system-images;android-25;google_apis;armeabi-v7a" -f --abi armeabi-v7a --tag google_apis
-- emulator -avd acib -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 512 &
+- echo no | android create avd --force --name testAVD -t android-25 -b google_apis/armeabi-v7a
+- emulator -avd testAVD -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 512 &
+- adb devices
 - adb wait-for-device get-serialno
 - android-wait-for-emulator
+
 
 script:
 - node ./test/platform-config --platform phonegap --os android
