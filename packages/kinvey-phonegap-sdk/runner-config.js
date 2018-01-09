@@ -96,6 +96,11 @@ function runPipeline(osName) {
                 command: 'cordova',
                 args: ['run', osName],
                 cwd: appRootPath
+            }),
+			runCommand({
+                command: 'adb',
+                args: ['devices'],
+                cwd: appRootPath
             })
         ]
     });
