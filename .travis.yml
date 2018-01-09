@@ -17,7 +17,7 @@ install:
     
 before_script:
 - echo no | android create avd --force --name testAVD -t android-25 -b google_apis/armeabi-v7a
-- emulator -avd testAVD -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 512 &
+- emulator -avd testAVD -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 2048 &
 - adb devices
 - adb wait-for-device get-serialno
 - android-wait-for-emulator
