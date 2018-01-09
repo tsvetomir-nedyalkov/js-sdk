@@ -20,7 +20,6 @@ before_script:
 - emulator -avd testAVD -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 2048 &
 - adb devices
 - adb wait-for-device get-serialno
-- android-wait-for-emulator
 
 
 script:
