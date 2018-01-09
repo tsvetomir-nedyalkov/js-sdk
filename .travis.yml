@@ -8,21 +8,48 @@ env:
 - Android="IntegrationTests"
 
 before_install:
-- nvm install 8.1.0
-- echo yes | sdkmanager "system-images;android-25;google_apis;armeabi-v7a"
+
+  -sdkmanager --list || true,
+   -sdkmanager --uninstall "system-images;android-15;default;armeabi-v7a",
+   -sdkmanager --uninstall "system-images;android-16;default;armeabi-v7a",
+   -sdkmanager --uninstall "system-images;android-17;default;armeabi-v7a",
+   -sdkmanager --uninstall "system-images;android-18;default;armeabi-v7a",
+   -sdkmanager --uninstall "system-images;android-19;default;armeabi-v7a",
+   -sdkmanager --uninstall "system-images;android-21;default;armeabi-v7a",
+   -sdkmanager --uninstall "extras;google;google_play_services",
+   -sdkmanager --uninstall "extras;android;support",
+   -sdkmanager --uninstall "platforms;android-10",
+   -sdkmanager --uninstall "platforms;android-15",
+   -sdkmanager --uninstall "platforms;android-16",
+   -sdkmanager --uninstall "platforms;android-17",
+   -sdkmanager --uninstall "platforms;android-18",
+   -sdkmanager --uninstall "platforms;android-19",
+   -sdkmanager --uninstall "platforms;android-20",
+   -sdkmanager --uninstall "platforms;android-21",
+   -sdkmanager --uninstall "build-tools;21.1.2",
+   -echo yes | sdkmanager "tools",
+   -echo yes | sdkmanager "platforms;android-25",
+   -echo yes | sdkmanager "platforms;android-25",
+   -echo yes | sdkmanager "extras;android;m2repository",
+   -echo yes | sdkmanager "extras;google;m2repository",
+   -echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2",
+   -echo yes | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2",
+   -echo yes | sdkmanager "system-images;android-25;google_apis;armeabi-v7a",
+   -echo no | avdmanager create avd -n acib -k "system-images;android-25;google_apis;armeabi-v7a" -f --abi armeabi-v7a --tag google_apis,
+   -emulator -avd acib -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 512 &,
+   -adb wait-for-device get-serialno,
+   -sdkmanager --list || true
 
 
 install:
+- nvm install 8.1.0
 - npm install -g cordova
 - android list targets
 - npm i
     
-before_script:
-- echo no | avdmanager create avd --force -n test -k "system-images;android-25;google_apis;armeabi-v7a"
-- emulator -avd test -no-skin -no-audio -no-window &
-- android-wait-for-emulator
 
 script:
+- android-wait-for-emulator
 - node ./test/platform-config --platform phonegap --os android
 
 
@@ -32,7 +59,4 @@ android:
     - tools
     - tools
     - platform-tools
-    - build-tools-26.0.2
-    - android-26
-    - android 25
-    - extra-google-google_play_services
+    - build-tools-25.0.2
