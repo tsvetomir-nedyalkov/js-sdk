@@ -11,8 +11,7 @@ before_install:
 - nvm install 8.1.0
 
 install:
-- echo yes | sdkmanager "platforms;android-25",
-- npm install -g cordova@7.1.0
+- npm install -g cordova@6.3.0
 - android list targets
 - npm i
     
