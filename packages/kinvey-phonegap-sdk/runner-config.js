@@ -94,7 +94,7 @@ function runPipeline(osName) {
             }),
             runCommand({
                 command: 'cordova',
-                args: ['run', osName],
+                args: ['run', osName, '--verbose'],
                 cwd: appRootPath
             })
         ]
