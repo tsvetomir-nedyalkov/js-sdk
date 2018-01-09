@@ -80,18 +80,18 @@ function runPipeline(osName) {
                 args: ['platform', 'add', osName],
                 cwd: appRootPath
             }),
-            ...[
-                //'https://github.com/apache/cordova-plugin-file.git',
-                'https://github.com/apache/cordova-plugin-whitelist',
-                //'https://github.com/apache/cordova-plugin-file-transfer.git',
-                'cordova-sqlite-storage'
-            ].map(p => {
-                return runCommand({
-                    command: 'cordova',
-                    args: ['plugin', 'add', '--force', p],
-                    cwd: appRootPath
-                });
-            }),
+            // ...[
+                // //'https://github.com/apache/cordova-plugin-file.git',
+                // 'https://github.com/apache/cordova-plugin-whitelist',
+                // //'https://github.com/apache/cordova-plugin-file-transfer.git',
+                // 'cordova-sqlite-storage'
+            // ].map(p => {
+                // return runCommand({
+                    // command: 'cordova',
+                    // args: ['plugin', 'add', '--force', p],
+                    // cwd: appRootPath
+                // });
+            // }),
             runCommand({
                 command: 'cordova',
                 args: ['run', osName],
