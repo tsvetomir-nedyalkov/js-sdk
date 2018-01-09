@@ -2,6 +2,7 @@ os: linux
 language: android
 dist: trusty
 jdk: oraclejdk8
+sudo: required,
 
 env: 
 - Android="IntegrationTests"
@@ -10,7 +11,7 @@ before_install:
 - nvm install 8.1.0
 
 install:
-- npm install -g cordova@7.1.0
+- npm install -g cordova
 - android list targets
 - npm i
     
