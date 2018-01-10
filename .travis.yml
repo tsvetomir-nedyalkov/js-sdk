@@ -5,7 +5,10 @@ sudo: required
 jdk: oraclejdk8
 
 env: 
-- Android="IntegrationTests"
+- Android="IntegrationTests1"
+- Android="IntegrationTests2"
+- Android="IntegrationTests3"
+- Android="IntegrationTests4"
 
 before_install:
 - nvm install 8.1.0
