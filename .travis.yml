@@ -24,6 +24,7 @@ before_script:
 
 
 
+
 script:
 - node ./test/platform-config --platform phonegap --os android
 
