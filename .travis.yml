@@ -19,8 +19,7 @@ before_script:
 - echo no | android create avd --force --name testAVD -t android-24 -b google_apis/armeabi-v7a
 - emulator -avd testAVD -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 2048 &
 - android-wait-for-emulator
-- travis_wait adb reboot
-- android-wait-for-emulator
+
 
 
 
