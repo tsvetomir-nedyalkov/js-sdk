@@ -23,8 +23,6 @@ before_script:
 - emulator -avd testAVD -engine classic -no-window -camera-back none -camera-front none -verbose -qemu -m 2048 &
 - adb devices
 - android-wait-for-emulator
-- adb reboot
-- android-wait-for-emulator
 
 
 
