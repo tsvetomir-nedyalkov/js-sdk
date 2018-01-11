@@ -1,6 +1,6 @@
 os: linux
 language: android
-dist: trusty
+dist: precise
 jdk: oraclejdk8
 
 env: 
@@ -10,7 +10,7 @@ before_install:
 - nvm install 8.1.0
 
 install:
-- npm install -g cordova
+- npm install -g cordova@6.1.1
 - android list targets
 - npm i
     
