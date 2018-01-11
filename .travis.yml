@@ -30,7 +30,7 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools
+    - build-tools-21.0.0
     - android-21
     - extra-android-m2repository
     - extra-google-google_play_services
