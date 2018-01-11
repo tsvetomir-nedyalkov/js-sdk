@@ -1,9 +1,6 @@
-os: osx
-env: 
-- Xcode="8.3"
-osx_image: xcode8.3
+os: linux
 language: android
-sudo: required
+dist: precise
 jdk: oraclejdk8
 
 env: 
@@ -13,7 +10,7 @@ before_install:
 - nvm install 8.1.0
 
 install:
-- npm install -g cordova
+- npm install -g cordova@7.1.0
 - android list targets
 - npm i
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
@@ -35,7 +32,6 @@ android:
     - platform-tools
     - build-tools-26.0.2
     - android-26
-    - android-23
     - extra-android-m2repository
     - extra-google-google_play_services
     - sys-img-armeabi-v7a-android-21
