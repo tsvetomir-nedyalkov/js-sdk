@@ -11,7 +11,7 @@ before_install:
 - nvm install 8.1.0
 
 install:
-- npm install -g cordova
+- npm install cordova
 - android list targets
 - npm i
     
