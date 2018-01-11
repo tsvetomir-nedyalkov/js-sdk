@@ -11,6 +11,8 @@ install:
 - npm i
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
 
+before_script:
+- open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 
 script:
 - node ./test/platform-config --platform phonegap --os ios
