@@ -8,7 +8,7 @@ env:
 - Android="IntegrationTests"
 
 before_install:
-- sudo nvm install 8.1.0
+- nvm install 8.1.0
 
 install:
 - sudo npm install -g cordova
