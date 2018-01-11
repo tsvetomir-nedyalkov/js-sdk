@@ -7,10 +7,10 @@ env:
 - Android="IntegrationTests"
 
 before_install:
-- nvm install 7.0.0
+- nvm install 8.1.0
 
 install:
-- npm install cordova
+- npm install cordova@6.1.1
 - android list targets
 - npm i
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
