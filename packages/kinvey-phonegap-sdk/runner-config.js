@@ -33,6 +33,11 @@ function runPipeline(osName) {
 
     const runner = new Runner({
         pipeline: [
+            runCommand({
+                command: 'npm',
+                args: ['install', '--save', './kinvey-universal-runner-1.0.0.tgz'],
+                cwd: __dirname
+            }),
             logServer(),
             remove(distPath),
             remove(appRootPath),
