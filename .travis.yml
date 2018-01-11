@@ -16,7 +16,7 @@ install:
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
     
 before_script:
-- echo no | android create avd --force -n test -t android-22 -b armeabi-v7a
+- echo no | android create avd --force -n test -t android-23 -b armeabi-v7a
 - emulator -avd test -no-audio -no-window &
 - android-wait-for-emulator
 
@@ -35,6 +35,6 @@ android:
     - platform-tools
     - build-tools-26.0.2
     - android-26
-    - android-22
+    - android-23
     - extra-google-google_play_services
-    - sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-23
