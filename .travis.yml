@@ -1,9 +1,11 @@
+os: osx
+env: 
+- Xcode="9.2"
+osx_image: xcode9.2
 language: android
-jdk: oraclejdk8
-sudo: false
 
 env: 
-- Android="IntegrationTests"
+- Android="Android Cordova Mac"
 
 before_install:
 - nvm install 8.1.0
@@ -15,7 +17,7 @@ install:
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
     
 before_script:
-- echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
+- echo no | android create avd --force -n test -t android-21 -b armeabi-v7a
 - emulator -avd test -no-audio -no-window &
 - android-wait-for-emulator
 
@@ -31,7 +33,7 @@ android:
     - platform-tools
     - build-tools-26.0.2
     - android-26
-    - android-19
+    - android-23
     - extra-android-m2repository
     - extra-google-google_play_services
-    - sys-img-armeabi-v7a-android-19
+    - sys-img-armeabi-v7a-android-21
