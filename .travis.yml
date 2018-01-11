@@ -21,7 +21,7 @@ before_script:
 
 script:
 - adb kill-server&&adb start-server
-- adb list
+- adb devices
 - node ./test/platform-config --platform phonegap --os android
 
 
