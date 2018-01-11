@@ -1,6 +1,7 @@
-os: linux
-language: android
-dist: precise
+os: osx
+env: 
+- Xcode="8.3"
+osx_image: xcode8.3
 sudo: required
 jdk: oraclejdk8
 
@@ -28,6 +29,7 @@ script:
 
 android:
   components:
+    - tools
     - tools
     - platform-tools
     - build-tools-26.0.2
