@@ -1,5 +1,24 @@
-language: node_js
-node_js:
-- '8.1.0'
+os: linux
+language: android
+dist: precise
+jdk: oraclejdk8
 
-script: npm install --save ./kinvey-universal-runner-1.0.0.tgz && node ./test/platform-config --platform html5
+env: 
+- Android="IntegrationTests"
+
+before_install:
+- nvm install 8.1.0
+
+install:
+- echo no | npm install -g nativescript
+- npm i
+- npm install --save ./kinvey-universal-runner-1.0.0.tgz
+    
+before_script:
+- echo no | android create avd --force -n test -t android-21 -b armeabi-v7a
+- emulator -avd test -no-audio -no-window &
+- android-wait-for-emulator
+
+
+script:
+- node ./test/platform-config --platform nativescript --os android
