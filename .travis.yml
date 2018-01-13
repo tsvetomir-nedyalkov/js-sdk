@@ -1,5 +1,7 @@
 language: node_js
 node_js:
-- '8.1.0'
+- '6.11.0'
 
-script: npm install --save ./kinvey-universal-runner-1.0.0.tgz && node ./test/platform-config --platform html5
+script: 
+- npm install --save ./kinvey-universal-runner-1.0.0.tgz
+- node ./test/platform-config --platform html5
