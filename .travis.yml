@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- '8.1.0'
+- '9'
 
 script: 
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
