@@ -2,6 +2,7 @@ language: node_js
 node_js:
 - '8.1.0'
 sudo: enabled
+group: deprecated-2017Q4
 
 script:
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
