@@ -1,5 +1,6 @@
 os: linux
 language: android
+group: deprecated-2017Q4
 sudo: enabled
 jdk: oraclejdk8
 
