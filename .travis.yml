@@ -1,19 +1,8 @@
-os: osx
-env: 
-- Xcode="8.3"
-osx_image: xcode8.3
-language: node_js 
-node_js: "8.1.0"
-jdk: oraclejdk8
-
-install:
-- echo no | npm install -g nativescript
-- tns usage-reporting disable
-- tns error-reporting disable
-
-before_script:
-- open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
+language: node_js
+node_js:
+- '8.1.0'
+sudo: enabled
 
 script:
-- echo no | tns device ios
-- npm i && node ./test/platform-config --platform nativescript --os ios
+- npm install --save ./kinvey-universal-runner-1.0.0.tgz
+- node ./test/platform-config --platform html5
