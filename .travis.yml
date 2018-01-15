@@ -1,6 +1,5 @@
 os: linux
 language: android
-sudo: enabled
 jdk: oraclejdk8
 
 env: 
