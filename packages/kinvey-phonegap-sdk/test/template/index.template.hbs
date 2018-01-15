@@ -9,19 +9,11 @@
 </head>
 
 <body>
-    <script src="./testRunner.bundle.js"></script>
 
     {{#each tests}}
     <script src="{{.}}"></script>
     {{/each}}
 
-    <script src="./kinvey-phonegap-sdk.js"></script>
-
-    <script>
-        runner.initialize(null, {
-            logServerPort: '{{logServerPort}}'
-        });
-    </script>
 </body>
 
 </html>

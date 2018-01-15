@@ -21,6 +21,7 @@ before_script:
 - android-wait-for-emulator
 
 script:
+- node ./test/platform-config --platform phonegap --os android
 - cd packages/kinvey-phonegap-sdk/KinveyCordovaTestApp/ && cordova run android
 
 after_script:
