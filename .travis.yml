@@ -1,16 +1,25 @@
-os: osx
-env: 
-- Xcode="8.3"
-osx_image: xcode8.3
-language: node_js
-node_js: "8.1.0"
-jdk: oraclejdk8
+matrix:
+  include:
+    - os: linux
+      language: node_js
+      node_js:  '8.1.0'
+      sudo: enabled
+      script: node ./test/platform-config --platform html5
+    - os: linux
+      language: node_js
+      node_js:  '9'
+      sudo: enabled
+      script: node ./test/platform-config --platform html5
+   
 
-install:
-- npm install -g cordova
-- npm i
-- npm install --save ./kinvey-universal-runner-1.0.0.tgz
-
-
-script:
-- node ./test/platform-config --platform phonegap --os ios
+android:
+  components:
+    - tools
+    - tools
+    - platform-tools
+    - build-tools-26.0.2
+    - android-26
+    - android-23
+    - extra-android-m2repository
+    - extra-google-google_play_services
+    - sys-img-armeabi-v7a-android-21
