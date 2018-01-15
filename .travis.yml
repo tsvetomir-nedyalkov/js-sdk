@@ -23,6 +23,7 @@ matrix:
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
       script:
+        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
         - node ./test/platform-config --platform nativescript --os android
    
 
