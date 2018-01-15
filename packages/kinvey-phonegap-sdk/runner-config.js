@@ -33,6 +33,7 @@ function runPipeline(osName) {
 
     const runner = new Runner({
         pipeline: [
+            logServer(),
             remove(distPath),
             remove(appRootPath),
             runCommand({
@@ -66,9 +67,22 @@ function runPipeline(osName) {
                 path.join(appPath, 'index.html')
             ),
             copyTestRunner(appPath),
+            when(() => osName === 'android', runCommand({
+                command: 'adb',
+                args: [
+                    'reverse',
+                    () => `tcp:${logServerPort}`,
+                    () => `tcp:${logServerPort}`
+                ]
+            })),
             runCommand({
                 command: 'cordova',
                 args: ['platform', 'add', osName],
+                cwd: appRootPath
+            }),
+            runCommand({
+                command: 'cordova',
+                args: ['run', osName],
                 cwd: appRootPath
             })
         ]
