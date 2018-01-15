@@ -1,8 +1,6 @@
-"use strict";
-
-before(function () {
+before(() => {
   Kinvey.init({
     appKey: externalConfig.appKey,
     appSecret: externalConfig.appSecret
   });
-});
+})
