@@ -1,9 +1,16 @@
+os: osx
+env: 
+- Xcode="9.2"
+osx_image: xcode9.2
 language: node_js
-node_js:
-- '8.1.0'
-sudo: enabled
-group: deprecated-2017Q4
+node_js: "8.1.0"
+jdk: oraclejdk8
+
+install:
+- npm install -g cordova
+- npm i
+- npm install --save ./kinvey-universal-runner-1.0.0.tgz
+
 
 script:
-- npm install --save ./kinvey-universal-runner-1.0.0.tgz
-- node ./test/platform-config --platform html5
+- node ./test/platform-config --platform phonegap --os ios
