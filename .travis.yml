@@ -16,7 +16,7 @@ install:
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
     
 before_script:
-- echo no | android create avd --force -n test -t android-25 -b google_apis/arm64-v8a
+- echo no | android create avd --force -n test -t android-24 -b arm64-v8a
 - emulator -avd test -no-window &
 - android-wait-for-emulator
 
@@ -35,7 +35,7 @@ android:
     - platform-tools
     - build-tools-26.0.2
     - android-26
-    - android-25
+    - android-24
     - extra-android-m2repository
     - extra-google-google_play_services
-    - sys-img-arm64-v8a-google_apis-25
+    - sys-img-arm64-v8a-android-24
