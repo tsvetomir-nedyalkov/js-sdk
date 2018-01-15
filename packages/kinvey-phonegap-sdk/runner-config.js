@@ -110,4 +110,3 @@ function runPipeline(osName) {
 }
 
 module.exports = runPipeline;
-
