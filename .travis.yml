@@ -1,15 +1,21 @@
 matrix:
   include:
     - os: linux
+      env: Platform="HTML5"
       language: node_js
-      node_js:  '8.1.0'
+      node_js: '8.1.0'
       sudo: enabled
-      script: node ./test/platform-config --platform html5
+      script: 
+        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
+        - node ./test/platform-config --platform html5
     - os: linux
+      env: Platform="HTML6"
       language: node_js
-      node_js:  '9'
+      node_js: '9'
       sudo: enabled
-      script: node ./test/platform-config --platform html5
+      script: 
+        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
+        - node ./test/platform-config --platform html5
    
 
 android:
