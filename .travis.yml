@@ -6,7 +6,7 @@ matrix:
       node_js: '9'
       script: 
         - npm run test
-      - os: linux
+    - os: linux
       env: Platform="NativeScript Android"
       language: android
       jdk: oraclejdk8
