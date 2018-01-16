@@ -1,6 +1,7 @@
 os: linux
 language: android
-sudo: enabled
+sudo: required
+dist: trusty
 jdk: oraclejdk8
 
 env: 
@@ -17,7 +18,7 @@ install:
     
 before_script:
 - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
-- emulator -avd test -no-window -gpu auto &
+- emulator -avd test &
 - android-wait-for-emulator
 
 script:
