@@ -1,12 +1,12 @@
 os: linux
 language: android
-dist: precise
 jdk: oraclejdk8
 
 env: 
 - Android="IntegrationTests"
 
 before_install:
+- adb list targets
 - nvm install 8.1.0
 
 install:
@@ -16,8 +16,8 @@ install:
 - npm install --save ./kinvey-universal-runner-1.0.0.tgz
     
 before_script:
-- echo no | android create avd --force -n test -t android-22 -b armeabi-v7a
-- emulator -avd test -no-audio -no-window &
+- echo no | android create avd --force -n test -t android-26 -b armeabi-v7a
+- emulator -avd test -no-window &
 - android-wait-for-emulator
 
 script:
@@ -35,7 +35,5 @@ android:
     - platform-tools
     - build-tools-26.0.2
     - android-26
-    - android-22
     - extra-android-m2repository
     - extra-google-google_play_services
-    - sys-img-armeabi-v7a-android-22
