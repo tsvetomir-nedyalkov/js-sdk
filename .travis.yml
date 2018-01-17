@@ -25,7 +25,8 @@ script:
 - node ./test/platform-config --platform phonegap --os android
 - adb devices
 - adb shell input keyevent 82 &
-- cd packages/kinvey-phonegap-sdk/KinveyCordovaTestApp/ && cordova run android
+- cd packages/kinvey-phonegap-sdk/KinveyCordovaTestApp/
+- cordova run android || true
 
 after_script:
 - adb logcat | grep chromium
