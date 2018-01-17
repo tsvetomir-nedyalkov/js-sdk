@@ -6,7 +6,6 @@ env:
 - Android="IntegrationTests"
 
 before_install:
-- adb list targets
 - nvm install 8.1.0
 
 install:
