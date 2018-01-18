@@ -10,7 +10,7 @@ import { isDefined } from '../utils';
 import { Client } from '../client';
 import { Query } from '../query';
 
-const pushInProgress = {};
+const pushInProgress = new Map();
 
 /**
  * @private
@@ -274,13 +274,13 @@ export class SyncManager {
 
     // Don't push data to the backend if we are in the middle
     // of already pushing data
-    if (pushInProgress[this.collection] === true) {
+    if (pushInProgress.get(this.collection) === true) {
       return Promise.reject(new SyncError('Data is already being pushed to the backend.'
         + ' Please wait for it to complete before pushing new data to the backend.'));
     }
 
     // Set pushInProgress to true
-    pushInProgress[this.collection] = true;
+    pushInProgress.set(this.collection, true);
 
     return this.find(query)
       .then((syncEntities) => {
@@ -505,12 +505,12 @@ export class SyncManager {
       })
       .then((result) => {
         // Set pushInProgress to false
-        pushInProgress[this.collection] = false;
+        pushInProgress.set(this.collection, false);
         return result;
       })
       .catch((error) => {
         // Set pushInProgress to false
-        pushInProgress[this.collection] = false;
+        pushInProgress.set(this.collection, false);
         throw error;
       });
   }
