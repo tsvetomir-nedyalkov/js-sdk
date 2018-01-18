@@ -13,6 +13,7 @@ install:
 - npm install -g cordova
 - android list targets
 - npm i
+- npm install --save ./kinvey-universal-runner-1.0.0.tgz
     
 before_script:
 - echo no | android create avd --force -n test -t android-21 -b armeabi-v7a
