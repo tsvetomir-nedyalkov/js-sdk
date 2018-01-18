@@ -1,6 +1,7 @@
 import sift from 'sift';
 import isPlainObject from 'lodash/isPlainObject';
 import assign from 'lodash/assign';
+import _keys from 'lodash/keys';
 import { QueryError } from './errors';
 import { nested, isDefined, isNumber } from './utils';
 import { Log } from './log';
@@ -201,7 +202,7 @@ export class Query {
             return true;
           }
 
-          return !Object.keys(value).some((condition) => {
+          return !_keys(value).some((condition) => {
             return condition === unsupportedConditions;
           });
         });
