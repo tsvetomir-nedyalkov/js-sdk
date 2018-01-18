@@ -22,6 +22,8 @@ before_script:
 
 script:
 - node ./test/platform-config --platform phonegap --os android
+- cd packages/kinvey-phonegap-sdk/KinveyCordovaTestApp/
+- cordova run android & adb logcat | grep chromium
 
 
 

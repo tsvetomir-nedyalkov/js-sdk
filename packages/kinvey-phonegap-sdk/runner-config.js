@@ -88,11 +88,6 @@ function runPipeline(osName) {
           args: ['plugin', 'add', '--force', p],
           cwd: appRootPath
         });
-      }),
-      runCommand({
-        command: 'cordova',
-        args: ['run', osName],
-        cwd: appRootPath
       })
     ]
   });
