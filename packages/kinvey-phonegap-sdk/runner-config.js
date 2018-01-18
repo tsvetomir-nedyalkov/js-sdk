@@ -30,7 +30,6 @@ let logServerPort;
 function runPipeline(osName) {
   const runner = new Runner({
     pipeline: [
-      logServer(),
       remove(distPath),
       remove(appRootPath),
       runCommand({
