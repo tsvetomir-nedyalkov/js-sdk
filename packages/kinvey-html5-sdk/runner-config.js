@@ -14,6 +14,8 @@ const {
     }
 } = require('kinvey-universal-runner');
 
+console.log('started--------------------------> ' + new Date());
+
 const serveTests = require('./test/tasks/serveTests');
 const webRunTests = require('./test/tasks/webRunTests');
 const rootMonoRepoPath = path.join(__dirname, '../../');
