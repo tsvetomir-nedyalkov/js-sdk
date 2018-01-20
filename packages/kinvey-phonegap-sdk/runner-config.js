@@ -20,6 +20,7 @@ const {
 
 console.log('started--------------------------> ' + new Date());
 
+
 const appName = 'KinveyCordovaTestApp';
 const appRootPath = path.join(__dirname, appName);
 const appPath = path.join(appRootPath, 'www');
