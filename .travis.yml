@@ -1,6 +1,6 @@
 matrix:
   include:
-    - stage: Unit Tests
+    stage: Unit Tests
       if: type IN (pull_request)
       - os: linux
         env: Platform="Unit Tests"
@@ -60,7 +60,7 @@ matrix:
 #         - node ./test/platform-config --platform phonegap --os ios
 
 
-    - stage: deploy
+    stage: deploy
       script: skip
       language: node_js
       node_js: '9'
