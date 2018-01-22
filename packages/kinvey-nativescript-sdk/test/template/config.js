@@ -3,3 +3,5 @@ externalConfig = {
   appSecret: 'aa42a6d47d0049129c985bfb37821877',
   collectionName: 'Books'
 };
+
+module.exports = externalConfig;
