@@ -1,13 +1,12 @@
-matrix:
-  include:
-    - stage: deploy
-      if: type IN (pull_request)
-      script: skip
-      language: node_js
-      node_js: '9'
-      deploy:
-        provider: script
-        script: node ./test/platform-config2 --platform html5
-        skip_cleanup: true
-        on:
-          all_branches: true  
+stages:
+  - name: deploy
+    if: type IN (pull_request)
+    script: skip
+    language: node_js
+    node_js: '9'
+    deploy:
+      provider: script
+      script: node ./test/platform-config2 --platform html5
+      skip_cleanup: true
+      on:
+        all_branches: true  
