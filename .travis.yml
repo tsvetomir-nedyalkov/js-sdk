@@ -1,7 +1,6 @@
-matrix:
+jobs:
   include:
-    stage: Unit Tests
-      if: type IN (pull_request)
+    - stage: Unit Tests
       - os: linux
         env: Platform="Unit Tests"
         language: node_js
@@ -60,18 +59,18 @@ matrix:
 #         - node ./test/platform-config --platform phonegap --os ios
 
 
-    stage: deploy
-      script: skip
-      language: node_js
-      node_js: '9'
-      env: 
-        Test="Test_Value"
-      deploy:
-        provider: script
-        script: node ./test/platform-config2 --platform html5
-        skip_cleanup: true
-        on:
-          all_branches: true  
+    # stage: deploy
+    #   script: skip
+    #   language: node_js
+    #   node_js: '9'
+    #   env: 
+    #     Test="Test_Value"
+    #   deploy:
+    #     provider: script
+    #     script: node ./test/platform-config2 --platform html5
+    #     skip_cleanup: true
+    #     on:
+    #       all_branches: true  
    
 
 # android:
