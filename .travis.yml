@@ -72,6 +72,8 @@ matrix:
       script: skip
       language: node_js
       node_js: '9'
+      env: 
+        Test="Test_Value"
       deploy:
         provider: script
         script: node ./test/platform-config2 --platform html5
