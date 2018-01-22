@@ -1,21 +1,23 @@
 matrix:
   include:
-    - os: linux
-      env: Platform="Unit Tests"
-      language: node_js
-      node_js: '9'
-      script: 
-        - npm run test
+    - stage: Unit Tests
+      if: type IN (pull_request)
+      - os: linux
+        env: Platform="Unit Tests"
+        language: node_js
+        node_js: '9'
+        script: 
+          - npm run test
 
 
-#     - os: linux
-#       env: Platform="HTML5"
-#       language: node_js
-#       node_js: '8.1.0'
-#       sudo: enabled
-#       script: 
-#         - npm install --save ./kinvey-universal-runner-1.0.0.tgz
-#         - node ./test/platform-config --platform html5
+      - os: linux
+        env: Platform="HTML5"
+        language: node_js
+        node_js: '8.1.0'
+        sudo: enabled
+        script: 
+          - npm install --save ./kinvey-universal-runner-1.0.0.tgz
+          - node ./test/platform-config --platform html5
 
 
 #     - os: linux
