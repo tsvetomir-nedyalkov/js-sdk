@@ -1,6 +1,5 @@
 stages:
   - name: deploy
-    if: type IN (push)
     script: skip
     language: node_js
     node_js: '9'
