@@ -9,6 +9,7 @@ matrix:
 
 
     - os: linux
+      if: type IN (pull_request)
       env: Platform="HTML5"
       language: node_js
       node_js: '8.1.0'
@@ -19,6 +20,7 @@ matrix:
 
 
     - os: linux
+      if: type IN (pull_request)
       env: Platform="NativeScript Android"
       language: android
       jdk: oraclejdk8
@@ -36,6 +38,7 @@ matrix:
 
 
     - os: osx
+      if: type IN (pull_request)
       env: Platform="NativeScript iOS"
       osx_image: xcode8.3
       language: node_js 
@@ -55,6 +58,7 @@ matrix:
 
 
     - os: osx
+      if: type IN (pull_request)
       env: Platform="PhoneGap iOS"
       osx_image: xcode9.2
       language: node_js
