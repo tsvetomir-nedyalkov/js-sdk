@@ -1,8 +1,13 @@
 matrix:
   include:
-    - os: linux
-      env: Platform="Unit Tests"
+    - stage: deploy
+      script: skip
       language: node_js
       node_js: '9'
-      script: 
-        - npm run test
+      deploy:
+        provider: script
+        script: node ./test/platform-config2 --platform html5
+        skip_cleanup: true
+        on:
+          all_branches: true  
+   
