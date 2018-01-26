@@ -1,5 +1,6 @@
 const path = require('path');
 const walk = require('klaw-sync');
+console.log('started at ----------------------->' + new Date());
 
 const {
   Runner,
