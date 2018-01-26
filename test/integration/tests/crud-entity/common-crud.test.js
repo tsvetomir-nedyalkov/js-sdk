@@ -758,7 +758,7 @@ function testFunc() {
                 .subscribe(onNextSpy, done, () => {
                   try {
                     // when MLIBZ-2156 is fixed, expectedAscendingCache should be replaced with expectedAscendingServer
-                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedAscendingCache, expectedAscendingServer);
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedAscendingServer, expectedAscendingServer);
                     done();
                   } catch (error) {
                     done(error);
