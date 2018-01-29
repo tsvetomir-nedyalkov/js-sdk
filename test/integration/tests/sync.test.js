@@ -270,9 +270,8 @@ function testFunc() {
               .catch(done);
           });
 
-          it('should update an already updated item on the server', (done) => {
-            const updatedEntityOnServer = Object.assign({ customProperty: utilities.randomString() }, entity2);
-            networkStore.save(updatedEntityOnServer)
+          it('should recreate a modified locally, but already deleted item on the server', (done) => {
+            networkStore.removeById(updatedEntity2._id)
               .then(() => storeToTest.push())
               .then((result) => validatePushOperation(result, entity1, updatedEntity2, entity3, 3))
               .then(done)
