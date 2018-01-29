@@ -145,6 +145,16 @@ function testFunc() {
               done();
             }).catch(done);
         });
+        
+        //should be added back for execution when MLIBZ-2188 is fixed
+        it.skip('clear() should clear the pending sync queue', (done) => {
+          syncStore.clear()
+            .then(() => storeToTest.pendingSyncCount())
+            .then((count) => {
+              expect(count).to.equal(0);
+              done();
+            }).catch(done);
+        });
 
         it('pendingSyncEntities() should return only the entities waiting to be synced', (done) => {
           storeToTest.pendingSyncEntities()
