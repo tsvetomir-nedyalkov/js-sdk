@@ -285,6 +285,17 @@ function testFunc() {
               .then(() => done())
               .catch(done);
           });
+
+          it('should make a silent push before the pull operation', (done) => {
+            syncStore.save(entity3)
+              .then(() => storeToTest.pull())
+              .then(() => networkStore.findById(entity3._id).toPromise())
+              .then((result) => {
+                expect(result._id).to.equal(entity3._id);
+                done();
+              })
+              .catch(done);
+          });
         });
 
         describe('sync()', () => {
