@@ -145,9 +145,9 @@ function testFunc() {
               done();
             }).catch(done);
         });
-        
+
         //should be added back for execution when MLIBZ-2188 is fixed
-        it.skip('clear() should clear the pending sync queue', (done) => {
+        it.skip('clear() should clear the pending sync queue from locally created items', (done) => {
           syncStore.clear()
             .then(() => storeToTest.pendingSyncCount())
             .then((count) => {
@@ -233,7 +233,7 @@ function testFunc() {
               .catch(done);
           });
 
-          it('should update local entities with result from network', (done) => {
+          it('should update local entities with the result from network', (done) => {
             storeToTest.push()
               .then(() => syncStore.find().toPromise())
               .then((offlineEntities) => {
@@ -267,6 +267,15 @@ function testFunc() {
                 expect(count).to.equal(1);
                 done();
               })
+              .catch(done);
+          });
+
+          it('should update an already updated item on the server', (done) => {
+            const updatedEntityOnServer = Object.assign({ customProperty: utilities.randomString() }, entity2);
+            networkStore.save(updatedEntityOnServer)
+              .then(() => storeToTest.push())
+              .then((result) => validatePushOperation(result, entity1, updatedEntity2, entity3, 3))
+              .then(done)
               .catch(done);
           });
         });
