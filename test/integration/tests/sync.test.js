@@ -296,6 +296,20 @@ function testFunc() {
               })
               .catch(done);
           });
+
+          it('should overwrite locally changed items', (done) => {
+            const updatedEntity3 = Object.assign({ newProperty: utilities.randomString() }, entity3);
+            cacheStore.save(entity3)
+              .then(() => syncStore.save(updatedEntity3))
+              .then(() => syncStore.clearSync())
+              .then(() => storeToTest.pull())
+              .then(() => syncStore.findById(updatedEntity3._id).toPromise())
+              .then((result) => {
+                expect(result.newProperty).to.not.exist;
+                done();
+              })
+              .catch(done);
+          });
         });
 
         describe('sync()', () => {
