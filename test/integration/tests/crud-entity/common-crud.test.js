@@ -841,6 +841,21 @@ function testFunc() {
 
           describe('Compound queries', () => {
 
+            it('combine a filter with a modifier', (done) => {
+              query.limit = 1;
+              query.ascending(numberFieldName);
+              query.greaterThanOrEqualTo(numberFieldName, entities[dataCount - 3][numberFieldName]);
+              const expectedEntities = [entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
           });
 
         });
