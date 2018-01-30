@@ -928,6 +928,27 @@ function testFunc() {
                   }
                 });
             });
+
+            it('joining operators priority  - AND, NOR, OR', (done) => {
+              query.equalTo(numberFieldName, entities[dataCount - 4][numberFieldName])
+                .nor()
+              query.equalTo(numberFieldName, entities[dataCount - 5][numberFieldName])
+                .and()
+              query.equalTo(numberFieldName, entities[dataCount - 4][numberFieldName])
+                .or()
+              query.equalTo(numberFieldName, entities[dataCount - 5][numberFieldName])
+              storeToTest.find(query).toPromise()
+                .then((result) => {
+                  if (dataStoreType === Kinvey.DataStoreType.Network) {
+                    expect(result).to.be.an.empty.array;
+                  }
+                  else {
+                    expect(result).to.be.null;
+                  }
+                  done();
+                })
+                .catch(done);
+            });
           });
         });
       });
