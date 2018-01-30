@@ -912,6 +912,22 @@ function testFunc() {
                   }
                 });
             });
+
+            it('two queries with an inline join operator', (done) => {
+              query.greaterThanOrEqualTo(numberFieldName, entities[dataCount - 3][numberFieldName])
+                .and()
+                .lessThanOrEqualTo(numberFieldName, entities[dataCount - 3][numberFieldName]);
+              const expectedEntities = [entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
           });
         });
       });
