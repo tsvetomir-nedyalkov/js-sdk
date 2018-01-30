@@ -858,7 +858,6 @@ function testFunc() {
             });
 
             it('two queries with a logical AND', (done) => {
-              query.ascending(numberFieldName);
               query.greaterThanOrEqualTo(numberFieldName, entities[dataCount - 3][numberFieldName]);
               const secondQuery = new Kinvey.Query();
               secondQuery.lessThanOrEqualTo(numberFieldName, entities[dataCount - 3][numberFieldName]);
@@ -874,8 +873,46 @@ function testFunc() {
                   }
                 });
             });
-          });
 
+            it('two queries with a logical OR', (done) => {
+              query.ascending(numberFieldName);
+              query.equalTo(numberFieldName, entities[dataCount - 3][numberFieldName]);
+              const secondQuery = new Kinvey.Query();
+              secondQuery.equalTo(numberFieldName, entities[dataCount - 2][numberFieldName]);
+              query.or(secondQuery);
+
+              const expectedEntities = [entities[dataCount - 3], entities[dataCount - 2]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+
+            it('two queries with a logical NOR', (done) => {
+              query.ascending(numberFieldName);
+              query.greaterThan(numberFieldName, entities[dataCount - 3][numberFieldName]);
+              const secondQuery = new Kinvey.Query();
+              secondQuery.lessThan(numberFieldName, entities[dataCount - 3][numberFieldName]);
+              // expect entities with numberFieldName not equal to entities[dataCount - 3]
+              query.nor(secondQuery);
+
+              const expectedEntities = [entities[dataCount - 1], entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+          });
         });
       });
 
