@@ -353,8 +353,7 @@ function testFunc() {
               });
           });
 
-          // should be added back for execution when MLIBZ-2157 is fixed
-          it.skip('query.notEqualTo with null', (done) => {
+          it('query.notEqualTo with null', (done) => {
             query.notEqualTo(textFieldName, null);
             const expectedEntities = entities.filter(entity => entity[textFieldName] !== null);
             storeToTest.find(query)
@@ -741,13 +740,14 @@ function testFunc() {
           let expectedAscending;
           let expectedDescending;
 
-          describe('Sort', () => {
-            before((done) => {
-              expectedAscending = _.sortBy(entities, numberFieldName);
-              expectedAscending.splice(0, 0, expectedAscending.pop());
-              expectedDescending = expectedAscending.slice().reverse();
-              done();
-            });
+          before((done) => {
+            expectedAscending = _.sortBy(entities, numberFieldName);
+            expectedAscending.splice(0, 0, expectedAscending.pop());
+            expectedDescending = expectedAscending.slice().reverse();
+            done();
+          });
+
+          describe('Sort, Limit, Skip', () => {
 
             it('should sort ascending', (done) => {
               query.ascending(numberFieldName);
@@ -838,6 +838,11 @@ function testFunc() {
                 });
             });
           });
+
+          describe('Compound queries', () => {
+
+          });
+
         });
       });
 
