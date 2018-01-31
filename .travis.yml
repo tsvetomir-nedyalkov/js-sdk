@@ -19,8 +19,61 @@ matrix:
         - travis_retry node ./test/integration/run-tests --platform html5
 
 
+    - os: linux
+      if: type IN (pull_request)
+      env: Platform="NativeScript Android"
+      language: android
+      jdk: oraclejdk8
+      before_install: nvm install 8.1.0
+      install:
+        - echo no | npm install -g nativescript
+        - npm i
+        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
+      before_script:
+        - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
+        - emulator -avd test -no-window &
+        - android-wait-for-emulator
+      script:
+        - travis_retry node ./test/integration/run-tests --platform nativescript --os android
+
+
+    - os: osx
+      if: type IN (pull_request)
+      env: Platform="NativeScript iOS"
+      osx_image: xcode8.3
+      language: node_js 
+      node_js: "8.1.0"
+      jdk: oraclejdk8
+      install:
+        - echo no | npm install -g nativescript
+        - tns usage-reporting disable
+        - tns error-reporting disable
+        - npm i
+        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
+      before_script:
+        - open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
+      script:
+        - echo no | tns device ios
+        - travis_retry node ./test/integration/run-tests --platform nativescript --os ios
+
+
+    - os: osx
+      if: type IN (pull_request)
+      env: Platform="PhoneGap iOS"
+      osx_image: xcode9.2
+      language: node_js
+      node_js: "8.1.0"
+      jdk: oraclejdk8
+      install:
+        - npm install -g cordova
+        - npm i
+        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
+      script:
+        - travis_retry node ./test/integration/run-tests --platform phonegap --os ios
+
 
     - stage: deploy
+      script: skip
       language: node_js
       node_js: '9'
       deploy:
@@ -28,6 +81,17 @@ matrix:
         script: node ./test/platform-config2 --platform html5
         skip_cleanup: true
         on:
-          branch: master
-          tags: true
+          all_branches: true  
    
+
+android:
+  components:
+    - tools
+    - tools
+    - platform-tools
+    - build-tools-26.0.2
+    - android-26
+    - android-24
+    - extra-android-m2repository
+    - extra-google-google_play_services
+    - sys-img-armeabi-v7a-android-24

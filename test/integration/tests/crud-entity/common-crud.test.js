@@ -67,7 +67,7 @@ function testFunc() {
               });
           });
 
-          it.only('should return the count for the collection', (done) => {
+          it('should return the count for the collection', (done) => {
             const onNextSpy = sinon.spy();
             storeToTest.count()
               .subscribe(onNextSpy, done, () => {
