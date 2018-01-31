@@ -16,7 +16,7 @@ matrix:
       sudo: enabled
       script: 
         - npm install --save ./kinvey-universal-runner-1.0.0.tgz
-        - node ./test/integration/run-tests --platform html5
+        - travis_retry node ./test/integration/run-tests --platform html5
 
 
     - os: linux
@@ -34,7 +34,7 @@ matrix:
         - emulator -avd test -no-window &
         - android-wait-for-emulator
       script:
-        - node ./test/integration/run-tests --platform nativescript --os android
+        - travis_retry node ./test/integration/run-tests --platform nativescript --os android
 
 
     - os: osx
@@ -54,7 +54,7 @@ matrix:
         - open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
       script:
         - echo no | tns device ios
-        - node ./test/integration/run-tests --platform nativescript --os ios
+        - travis_retry node ./test/integration/run-tests --platform nativescript --os ios
 
 
     - os: osx
@@ -69,7 +69,7 @@ matrix:
         - npm i
         - npm install --save ./kinvey-universal-runner-1.0.0.tgz
       script:
-        - node ./test/integration/run-tests --platform phonegap --os ios
+        - travis_retry node ./test/integration/run-tests --platform phonegap --os ios
 
 
     - stage: deploy
