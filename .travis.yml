@@ -15,7 +15,6 @@ matrix:
       node_js: '8.1.0'
       sudo: enabled
       script: 
-        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
         - travis_retry node ./test/integration/run-tests --platform html5
 
 
@@ -28,7 +27,6 @@ matrix:
       install:
         - echo no | npm install -g nativescript
         - npm i
-        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
       before_script:
         - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
         - emulator -avd test -no-window &
@@ -49,7 +47,6 @@ matrix:
         - tns usage-reporting disable
         - tns error-reporting disable
         - npm i
-        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
       before_script:
         - open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
       script:
@@ -67,7 +64,6 @@ matrix:
       install:
         - npm install -g cordova
         - npm i
-        - npm install --save ./kinvey-universal-runner-1.0.0.tgz
       script:
         - travis_retry node ./test/integration/run-tests --platform phonegap --os ios
 
