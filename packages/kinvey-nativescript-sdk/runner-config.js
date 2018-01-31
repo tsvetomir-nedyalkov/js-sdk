@@ -1,6 +1,7 @@
 const path = require('path');
 const walk = require('klaw-sync');
 const testedSdkVersion = require('./package.json').version;
+console.log('started at ----------------------->' + new Date());
 
 const {
   Runner,

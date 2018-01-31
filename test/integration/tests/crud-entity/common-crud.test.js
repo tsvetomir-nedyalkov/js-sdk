@@ -3,6 +3,7 @@ function testFunc() {
   const invalidQueryMessage = 'Invalid query. It must be an instance of the Query class.';
   const notFoundErrorName = 'NotFoundError';
   const { collectionName } = externalConfig;
+  
 
   dataStoreTypes.forEach((currentDataStoreType) => {
     describe(`CRUD Entity - ${currentDataStoreType}`, () => {
@@ -66,7 +67,7 @@ function testFunc() {
               });
           });
 
-          it('should return the count for the collection', (done) => {
+          it.only('should return the count for the collection', (done) => {
             const onNextSpy = sinon.spy();
             storeToTest.count()
               .subscribe(onNextSpy, done, () => {
@@ -757,7 +758,7 @@ function testFunc() {
                 .subscribe(onNextSpy, done, () => {
                   try {
                     // when MLIBZ-2156 is fixed, expectedAscendingCache should be replaced with expectedAscendingServer
-                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedAscendingCache, expectedAscendingServer);
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedAscendingServer, expectedAscendingServer);
                     done();
                   } catch (error) {
                     done(error);
