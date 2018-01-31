@@ -73,7 +73,6 @@ matrix:
 
 
     - stage: deploy
-      script: skip
       language: node_js
       node_js: '9'
       deploy:
