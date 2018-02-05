@@ -76,7 +76,8 @@ matrix:
         script: node ./test/platform-config2 --platform html5
         skip_cleanup: true
         on:
-          all_branches: true  
+          branch: master
+          tags: true
    
 
 android:
