@@ -1,4 +1,6 @@
-matrix:
+env:
+  matrix:
+  TEST_VARIABLE='aaaaaaaaaa'
   include:
     - os: linux
       env: Platform="Unit Tests"
@@ -74,10 +76,10 @@ matrix:
       node_js: '9'
       deploy:
         provider: script
-        script: node ./test/platform-config2 --platform html5
+        script: echo TEST_VARIABLE
         skip_cleanup: true
         on:
-          all_branches: true  
+          all_branches: true 
    
 
 android:
@@ -92,7 +94,3 @@ android:
     - extra-google-google_play_services
     - sys-img-armeabi-v7a-android-24
 
-
-notifications:
-  email:
-    - ceco19800@gmail.com
