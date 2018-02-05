@@ -69,6 +69,7 @@ matrix:
 
 
     - stage: deploy
+      script: skip
       language: node_js
       node_js: '9'
       deploy:
@@ -76,8 +77,7 @@ matrix:
         script: node ./test/platform-config2 --platform html5
         skip_cleanup: true
         on:
-          branch: master
-          tags: true
+          all_branches: true  
    
 
 android:
