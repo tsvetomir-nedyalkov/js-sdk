@@ -1,6 +1,7 @@
 env:
-  matrix:
-  TEST_VARIABLE='aaaaaaaaaa'
+  - TEST_VARIABLE='aaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+matrix:
   include:
     - os: linux
       env: Platform="Unit Tests"
@@ -71,7 +72,6 @@ env:
 
 
     - stage: deploy
-      script: skip
       language: node_js
       node_js: '9'
       deploy:
@@ -82,7 +82,7 @@ env:
           all_branches: true 
    
 
-  android:
+android:
   components:
     - tools
     - tools
@@ -93,4 +93,5 @@ env:
     - extra-android-m2repository
     - extra-google-google_play_services
     - sys-img-armeabi-v7a-android-24
+
 
