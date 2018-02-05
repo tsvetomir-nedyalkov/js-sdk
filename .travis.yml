@@ -92,3 +92,7 @@ android:
     - extra-google-google_play_services
     - sys-img-armeabi-v7a-android-24
 
+
+notifications:
+  email:
+    - ceco19800@gmail.com
