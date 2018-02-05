@@ -76,7 +76,7 @@ matrix:
       node_js: '9'
       deploy:
         provider: script
-        script: echo TEST_VARIABLE
+        script: echo ${TEST_VARIABLE}
         skip_cleanup: true
         on:
           all_branches: true 
