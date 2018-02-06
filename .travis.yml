@@ -1,5 +1,8 @@
 env:
-  - TEST_VARIABLE='aaaaaaaaaaaaaaaaaaaaaaaaaa'
+  global:
+    - CAMPFIRE_TOKEN='abc123'
+  matrix:
+    - USE_NETWORK='bbbbbbbbbbbbbb'
 
 matrix:
   include:
@@ -77,7 +80,7 @@ matrix:
       node_js: '9'
       deploy:
         provider: script
-        script: echo ${TEST_VARIABLE}
+        script: echo ${USE_NETWORK} && echo ${CAMPFIRE_TOKEN}
         skip_cleanup: true
         on:
           all_branches: true 
