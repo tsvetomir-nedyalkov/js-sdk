@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tsvetomir-nedyalkov/js-sdk.svg?branch=master)](https://travis-ci.org/tsvetomir-nedyalkov/js-sdk)
+[![Build Status](https://travis-ci.org/tsvetomir-nedyalkov/js-sdk.svg?branch=test-latest)](https://travis-ci.org/tsvetomir-nedyalkov/js-sdk)
 
 # Overview
 
