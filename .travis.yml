@@ -1,5 +1,5 @@
 env:
-  - TEST_VARIABLE='aaaaaaaaaaaaaaaaaaaaaaaaaa'
+  - TEST1 = 'aaaaa'
 
 matrix:
   include:
@@ -72,11 +72,12 @@ matrix:
 
 
     - stage: deploy
+      script: skip
       language: node_js
       node_js: '9'
       deploy:
         provider: script
-        script: echo ${TEST_VARIABLE}
+        script: echo ${TEST1}
         skip_cleanup: true
         on:
           all_branches: true 
@@ -95,3 +96,6 @@ android:
     - sys-img-armeabi-v7a-android-24
 
 
+notifications:
+  email:
+    - ceco19800@gmail.com
