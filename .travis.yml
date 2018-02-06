@@ -4,7 +4,7 @@ env:
     - INTEGRATION_TESTS_NATIVESCRIPT_VERSION='3.4.2'
     - INTEGRATION_TESTS_CORDOVA_VERSION='8.0.0'
     - UNIT_TESTS_NODEJS_VERSION='9'
-    - RUN_INTEGRATION_TESTS_FILE = 'aaa'
+    - RUN_INTEGRATION_TESTS_FILE_LOCATION='./test/integration/run-tests'
   matrix:
     - USE_NETWORK='bbbbbbbbbbbbbb'
 
@@ -25,7 +25,7 @@ matrix:
       node_js: ${INTEGRATION_TESTS_NODEJS_VERSION}
       sudo: enabled
       script: 
-        - node ${RUN_INTEGRATION_TESTS_FILE} --platform html5
+        - node ${RUN_INTEGRATION_TESTS_FILE_LOCATION} --platform html5
 
 
     - os: linux
