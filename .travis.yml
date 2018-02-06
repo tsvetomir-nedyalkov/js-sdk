@@ -1,9 +1,10 @@
 env:
   global:
-    - INTEGRATION_TESTS_NODEJS_VERSION='7.0.0'
-    - INTEGRATION_TESTS_NATIVESCRIPT_VERSION='3.0.0'
-    - INTEGRATION_TESTS_CORDOVA_VERSION='7.1.0'
-    - UNIT_TESTS_NODEJS_VERSION='8.0.0'
+    - INTEGRATION_TESTS_NODEJS_VERSION='8.1.0'
+    - INTEGRATION_TESTS_NATIVESCRIPT_VERSION='3.4.2'
+    - INTEGRATION_TESTS_CORDOVA_VERSION='8.0.0'
+    - UNIT_TESTS_NODEJS_VERSION='9'
+    - RUN_INTEGRATION_TESTS_FILE_LOCATION = './test/integration/run-tests'
   matrix:
     - USE_NETWORK='bbbbbbbbbbbbbb'
 
@@ -24,7 +25,7 @@ matrix:
       node_js: ${INTEGRATION_TESTS_NODEJS_VERSION}
       sudo: enabled
       script: 
-        - node ./test/integration/run-tests --platform html5
+        - node ${RUN_INTEGRATION_TESTS_FILE_LOCATION} --platform html5
 
 
     - os: linux
@@ -41,7 +42,7 @@ matrix:
         - emulator -avd test -no-window &
         - android-wait-for-emulator
       script:
-        - node ./test/integration/run-tests --platform nativescript --os android
+        - node ${RUN_INTEGRATION_TESTS_FILE_LOCATION} --platform nativescript --os android
 
 
     - os: osx
@@ -60,7 +61,7 @@ matrix:
         - open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
       script:
         - echo no | tns device ios
-        - node ./test/integration/run-tests --platform nativescript --os ios
+        - node ${RUN_INTEGRATION_TESTS_FILE_LOCATION} --platform nativescript --os ios
 
 
     - os: osx
@@ -74,7 +75,7 @@ matrix:
         - npm i -g cordova@${INTEGRATION_TESTS_CORDOVA_VERSION}
         - npm i
       script:
-        - node ./test/integration/run-tests --platform phonegap --os ios
+        - node ${RUN_INTEGRATION_TESTS_FILE_LOCATION} --platform phonegap --os ios
 
 
     - stage: deploy
