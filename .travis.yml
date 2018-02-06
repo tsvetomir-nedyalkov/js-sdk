@@ -1,5 +1,5 @@
 env:
-  - TESTVAR = "aaaaa"
+  - TEST_VARIABLE='aaaaaaaaaaaaaaaaaaaaaaaaaa'
 
 matrix:
   include:
@@ -77,7 +77,7 @@ matrix:
       node_js: '9'
       deploy:
         provider: script
-        script: echo ${TESTVAR}
+        script: echo ${TEST_VARIABLE}
         skip_cleanup: true
         on:
           all_branches: true 
