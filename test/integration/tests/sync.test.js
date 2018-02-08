@@ -67,6 +67,13 @@ function testFunc() {
       });
   };
 
+  const validateSyncEntity = (syncEntity, operationType, expectedEntityIds) => {
+    expect(syncEntity._id).to.exist;
+    expect(utilities.ensureArray(expectedEntityIds)).to.include(syncEntity.entityId);
+    expect(syncEntity.collection).to.equal(collectionName);
+    expect(syncEntity.state).to.deep.equal({ operation: operationType }); // for now, this is all that is kept in the state
+  };
+
   dataStoreTypes.forEach((currentDataStoreType) => {
     describe(`${currentDataStoreType} Sync Tests`, () => {
       const dataStoreType = currentDataStoreType;
@@ -107,76 +114,124 @@ function testFunc() {
             .catch(done);
         });
 
-        it('pendingSyncCount() should return the count of the entities waiting to be synced', (done) => {
-          storeToTest.pendingSyncCount()
-            .then((count) => {
-              expect(count).to.equal(2);
-              done();
-            }).catch(done);
+        describe('pendingSyncCount()', () => {
+          it('should return the count of the entities waiting to be synced', (done) => {
+            storeToTest.pendingSyncCount()
+              .then((count) => {
+                expect(count).to.equal(2);
+                done();
+              })
+              .catch(done);
+          });
+
+          it('should return the count of the entities, matching the query', (done) => {
+            const query = new Kinvey.Query();
+            query.equalTo('_id', entity1._id);
+            storeToTest.pendingSyncCount(query)
+              .then((count) => {
+                expect(count).to.equal(1);
+                done();
+              })
+              .catch(done);
+          });
+
+          // CacheStore should have the same behavior, but it's difficult to simulate, since it only happens when the network request fails
+          if (dataStoreType === Kinvey.DataStoreType.Sync) {
+            // pending fix for MLIBZ-2177
+            it.skip('should return the count of matching entities even if they are deleted', (done) => {
+              storeToTest.removeById(entity1._id)
+                .then((result) => {
+                  expect(result).to.deep.equal({ count: 1 });
+                  const query = new Kinvey.Query();
+                  query.equalTo('_id', entity1._id);
+                  return storeToTest.pendingSyncCount(query);
+                })
+                .then((count) => {
+                  expect(count).to.equal(1);
+                  done();
+                })
+                .catch(done);
+            });
+          }
         });
 
-        it('pendingSyncCount() should return the count of the entities, matching the query', (done) => {
-          const query = new Kinvey.Query();
-          query.equalTo('_id', entity1._id);
-          storeToTest.pendingSyncCount(query)
-            .then((count) => {
-              expect(count).to.equal(1);
-              done();
-            }).catch(done);
+        describe('clearSync()', () => {
+          it('should clear the pending sync queue', (done) => {
+            syncStore.clearSync()
+              .then(() => storeToTest.pendingSyncCount())
+              .then((count) => {
+                expect(count).to.equal(0);
+                done();
+              }).catch(done);
+          });
+
+          it('should clear only the items, matching the query from the pending sync queue', (done) => {
+            const query = new Kinvey.Query();
+            query.equalTo('_id', entity1._id);
+            syncStore.clearSync(query)
+              .then(() => storeToTest.pendingSyncEntities())
+              .then((result) => {
+                expect(result.length).to.equal(1);
+                validateSyncEntity(result[0], 'PUT', entity2._id);
+                done();
+              }).catch(done);
+          });
         });
 
-        it('clearSync() should clear the pending sync queue', (done) => {
-          syncStore.clearSync()
-            .then(() => storeToTest.pendingSyncCount())
-            .then((count) => {
-              expect(count).to.equal(0);
-              done();
-            }).catch(done);
-        });
+        describe('pendingSyncEntities()', () => {
+          it('should return only the entities waiting to be synced', (done) => {
+            storeToTest.pendingSyncEntities()
+              .then((entities) => {
+                expect(entities.length).to.equal(2);
+                entities.forEach((entity) => {
+                  validateSyncEntity(entity, 'PUT', [entity1._id, entity2._id]);
+                });
+                done();
+              })
+              .catch(done);
+          });
 
-        it('clearSync() should clear only the items, matching the query from the pending sync queue', (done) => {
-          const query = new Kinvey.Query();
-          query.equalTo('_id', entity1._id);
-          syncStore.clearSync(query)
-            .then(() => storeToTest.pendingSyncEntities())
-            .then((result) => {
-              expect(result.length).to.equal(1);
-              expect(result[0].entityId).to.equal(entity2._id);
-              done();
-            }).catch(done);
-        });
+          it('should return only the entities, matching the query', (done) => {
+            const query = new Kinvey.Query();
+            query.equalTo('_id', entity1._id);
+            storeToTest.pendingSyncEntities(query)
+              .then((entities) => {
+                expect(entities.length).to.equal(1);
+                validateSyncEntity(entities[0], 'PUT', entity1._id);
+                done();
+              })
+              .catch(done);
+          });
 
-        it('pendingSyncEntities() should return only the entities waiting to be synced', (done) => {
-          storeToTest.pendingSyncEntities()
-            .then((entities) => {
-              expect(entities.length).to.equal(2);
-              entities.forEach((entity) => {
-                expect(entity.collection).to.equal(collectionName);
-                expect(entity.state.operation).to.equal('PUT');
-                expect([entity1._id, entity2._id]).to.include(entity.entityId);
-              });
-              done();
-            }).catch(done);
-        });
+          // CacheStore should have the same behavior, but it's difficult to simulate, since it only happens when the network request fails
+          if (dataStoreType === Kinvey.DataStoreType.Sync) {
+            // pending fix for MLIBZ-2177
+            it.skip('should return the matching entities, even if they are deleted', (done) => {
+              storeToTest.removeById(entity1._id)
+                .then((result) => {
+                  expect(result).to.deep.equal({ count: 1 });
+                  const query = new Kinvey.Query();
+                  query.equalTo('_id', entity1._id);
+                  return storeToTest.pendingSyncEntities(query);
+                })
+                .then((syncEntities) => {
+                  expect(syncEntities.length).to.equal(1);
+                  validateSyncEntity(syncEntities[0], 'DELETE', entity1._id);
+                  done();
+                })
+                .catch(done);
+            });
+          }
 
-        it('pendingSyncEntities() should return only the entities, matching the query', (done) => {
-          const query = new Kinvey.Query();
-          query.equalTo('_id', entity1._id);
-          storeToTest.pendingSyncEntities(query)
-            .then((entities) => {
-              expect(entities.length).to.equal(1);
-              expect(entities[0].entityId).to.equal(entity1._id);
-              done();
-            }).catch(done);
-        });
-
-        it('pendingSyncEntities() should return an empty array if there are no entities waiting to be synced', (done) => {
-          syncStore.clearSync()
-            .then(() => storeToTest.pendingSyncEntities())
-            .then((entities) => {
-              expect(entities).to.be.an.empty.array;
-              done();
-            }).catch(done);
+          it('should return an empty array if there are no entities waiting to be synced', (done) => {
+            syncStore.clearSync()
+              .then(() => storeToTest.pendingSyncEntities())
+              .then((entities) => {
+                expect(entities).to.be.an.empty.array;
+                done();
+              })
+              .catch(done);
+          });
         });
       });
 
@@ -223,7 +278,7 @@ function testFunc() {
               .catch(done);
           });
 
-          it('should update local entities with result from network', (done) => {
+          it('should update local entities with the result from network', (done) => {
             storeToTest.push()
               .then(() => syncStore.find().toPromise())
               .then((offlineEntities) => {
@@ -259,6 +314,14 @@ function testFunc() {
               })
               .catch(done);
           });
+
+          it('should recreate a modified locally, but already deleted item on the server', (done) => {
+            networkStore.removeById(updatedEntity2._id)
+              .then(() => storeToTest.push())
+              .then((result) => validatePushOperation(result, entity1, updatedEntity2, entity3, 3))
+              .then(done)
+              .catch(done);
+          });
         });
 
         describe('pull()', () => {
@@ -283,6 +346,31 @@ function testFunc() {
             storeToTest.pull(query)
               .then((result) => validatePullOperation(result, [entity1]))
               .then(() => done())
+              .catch(done);
+          });
+
+          it('should make a silent push before the pull operation', (done) => {
+            syncStore.save(entity3)
+              .then(() => storeToTest.pull())
+              .then(() => networkStore.findById(entity3._id).toPromise())
+              .then((result) => {
+                expect(result._id).to.equal(entity3._id);
+                done();
+              })
+              .catch(done);
+          });
+
+          it('should overwrite locally changed items', (done) => {
+            const updatedEntity3 = Object.assign({ newProperty: utilities.randomString() }, entity3);
+            cacheStore.save(entity3)
+              .then(() => syncStore.save(updatedEntity3))
+              .then(() => syncStore.clearSync())
+              .then(() => storeToTest.pull())
+              .then(() => syncStore.findById(updatedEntity3._id).toPromise())
+              .then((result) => {
+                expect(result.newProperty).to.not.exist;
+                done();
+              })
               .catch(done);
           });
         });
