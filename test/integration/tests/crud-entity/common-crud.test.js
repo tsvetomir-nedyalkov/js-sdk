@@ -741,14 +741,15 @@ function testFunc() {
           let expectedAscending;
           let expectedDescending;
 
-          describe('Sort', () => {
-            before((done) => {
-              expectedAscending = _.sortBy(entities, numberFieldName);
-              // moving entities with null values at the beginning of the array, as this is the sort order on the server
-              expectedAscending.unshift(expectedAscending.pop());
-              expectedDescending = expectedAscending.slice().reverse();
-              done();
-            });
+          before((done) => {
+            expectedAscending = _.sortBy(entities, numberFieldName);
+            // moving entities with null values at the beginning of the array, as this is the sort order on the server
+            expectedAscending.unshift(expectedAscending.pop());
+            expectedDescending = expectedAscending.slice().reverse();
+            done();
+          });
+
+          describe('Sort, Skip, Limit', () => {
 
             it('should sort ascending', (done) => {
               query.ascending(numberFieldName);
@@ -837,6 +838,123 @@ function testFunc() {
                     done(error);
                   }
                 });
+            });
+          });
+
+          describe('Compound queries', () => {
+
+            it('combine a filter with a modifier', (done) => {
+              const numberfieldValue = entities[dataCount - 3][numberFieldName];
+              query.limit = 1;
+              query.ascending(numberFieldName);
+              query.greaterThanOrEqualTo(numberFieldName, numberfieldValue);
+              const expectedEntities = [entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+
+            it('two queries with a logical AND', (done) => {
+              const numberfieldValue = entities[dataCount - 3][numberFieldName];
+              query.greaterThanOrEqualTo(numberFieldName, numberfieldValue);
+              const secondQuery = new Kinvey.Query();
+              secondQuery.lessThanOrEqualTo(numberFieldName, numberfieldValue);
+              query.and(secondQuery);
+              const expectedEntities = [entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+
+            it('two queries with a logical OR', (done) => {
+              query.ascending(numberFieldName);
+              query.equalTo(numberFieldName, entities[dataCount - 3][numberFieldName]);
+              const secondQuery = new Kinvey.Query();
+              secondQuery.equalTo(numberFieldName, entities[dataCount - 2][numberFieldName]);
+              query.or(secondQuery);
+
+              const expectedEntities = [entities[dataCount - 3], entities[dataCount - 2]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+
+            it('two queries with a logical NOR', (done) => {
+              const numberfieldValue = entities[dataCount - 3][numberFieldName];
+              query.ascending(numberFieldName);
+              query.greaterThan(numberFieldName, numberfieldValue);
+              const secondQuery = new Kinvey.Query();
+              secondQuery.lessThan(numberFieldName, numberfieldValue);
+              // expect entities with numberFieldName not equal to entities[dataCount - 3]
+              query.nor(secondQuery);
+
+              const expectedEntities = [entities[dataCount - 1], entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+
+            it('two queries with an inline join operator', (done) => {
+              const numberfieldValue = entities[dataCount - 3][numberFieldName];
+              query.greaterThanOrEqualTo(numberFieldName, numberfieldValue)
+                .and()
+                .lessThanOrEqualTo(numberFieldName, numberfieldValue);
+              const expectedEntities = [entities[dataCount - 3]];
+              storeToTest.find(query)
+                .subscribe(onNextSpy, done, () => {
+                  try {
+                    utilities.validateReadResult(dataStoreType, onNextSpy, expectedEntities, expectedEntities);
+                    done();
+                  } catch (error) {
+                    done(error);
+                  }
+                });
+            });
+
+            //skipping for now - the behaviour should be confirmed, as currently there is no priority
+            it.skip('joining operators priority  - AND, NOR, OR', (done) => {
+              query.equalTo(numberFieldName, entities[dataCount - 4][numberFieldName])
+                .nor()
+              query.equalTo(numberFieldName, entities[dataCount - 5][numberFieldName])
+                .and()
+              query.equalTo(numberFieldName, entities[dataCount - 4][numberFieldName])
+                .or()
+              query.equalTo(numberFieldName, entities[dataCount - 5][numberFieldName])
+              storeToTest.find(query).toPromise()
+                .then((result) => {
+                  if (dataStoreType === Kinvey.DataStoreType.Network) {
+                    expect(result).to.be.an.empty.array;
+                  }
+                  else {
+                    expect(result).to.be.null;
+                  }
+                  done();
+                })
+                .catch(done);
             });
           });
         });
