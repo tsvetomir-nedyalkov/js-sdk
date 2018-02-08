@@ -1055,6 +1055,63 @@ function testFunc() {
         });
       });
 
+      describe('create()', () => {
+        before((done) => {
+          utilities.cleanUpCollectionData(collectionName)
+            .then(() => utilities.saveEntities(collectionName, [entity1, entity2]))
+            .then(() => done())
+            .catch(done);
+        });
+
+        it('should throw an error when trying to create an array of entities', (done) => {
+          storeToTest.create([entity1, entity2])
+            .catch((error) => {
+              expect(error.message).to.equal('Unable to create an array of entities.');
+              done();
+            })
+            .catch(done);
+        });
+
+        it('should create a new entity without _id', (done) => {
+          const newEntity = {
+            [textFieldName]: utilities.randomString()
+          };
+
+          storeToTest.create(newEntity)
+            .then((createdEntity) => {
+              expect(createdEntity._id).to.exist;
+              expect(createdEntity[textFieldName]).to.equal(newEntity[textFieldName]);
+              if (dataStoreType === Kinvey.DataStoreType.Sync) {
+                expect(createdEntity._kmd.local).to.be.true;
+              } else {
+                utilities.assertEntityMetadata(createdEntity);
+              }
+              newEntity._id = createdEntity._id;
+              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+            })
+            .then(() => {
+              return utilities.validatePendingSyncCount(dataStoreType, collectionName, 1);
+            })
+            .then(() => done())
+            .catch(done);
+        });
+
+        it('should create a new entity using its _id', (done) => {
+          const id = utilities.randomString();
+          const textFieldValue = utilities.randomString();
+          const newEntity = utilities.getEntity(id, textFieldValue);
+
+          storeToTest.create(newEntity)
+            .then((createdEntity) => {
+              expect(createdEntity._id).to.equal(id);
+              expect(createdEntity[textFieldName]).to.equal(textFieldValue);
+              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+            })
+            .then(() => done())
+            .catch(done);
+        });
+      });
+
       describe('destroy operations', () => {
         before((done) => {
           utilities.cleanUpCollectionData(collectionName)
