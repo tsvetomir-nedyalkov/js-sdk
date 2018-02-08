@@ -1066,21 +1066,6 @@ function testFunc() {
               .catch(done);
           });
 
-          it.skip('should throw an error when trying to create an entity with an already existing _id', (done) => {
-            const newEntity = {
-              [textFieldName]: utilities.randomString()
-            };
-
-            storeToTest.create(newEntity)
-              .then((createdEntity) => storeToTest.create({ _id: createdEntity._id }))
-              .then(done(new Error('Should not be called')))
-              .catch((error) => {
-                expect(error.debug).to.equal('An entity with that _id already exists in this collection');
-                done();
-              })
-              .catch(done);
-          });
-
           it('should create a new entity without _id', (done) => {
             const newEntity = {
               [textFieldName]: utilities.randomString()
