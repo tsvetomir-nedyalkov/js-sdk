@@ -971,7 +971,7 @@ function testFunc() {
         });
       });
 
-      describe('save()', () => {
+      describe('save/create/update operations', () => {
         before((done) => {
           utilities.cleanUpCollectionData(collectionName)
             .then(() => utilities.saveEntities(collectionName, [entity1, entity2]))
@@ -988,208 +988,197 @@ function testFunc() {
           return Promise.resolve();
         });
 
-        it('should throw an error when trying to save an array of entities', (done) => {
-          storeToTest.save([entity1, entity2])
-            .catch((error) => {
-              expect(error.message).to.equal('Unable to create an array of entities.');
-              done();
-            })
-            .catch(done);
+        describe('save()', () => {
+          it('should throw an error when trying to save an array of entities', (done) => {
+            storeToTest.save([entity1, entity2])
+              .catch((error) => {
+                expect(error.message).to.equal('Unable to create an array of entities.');
+                done();
+              })
+              .catch(done);
+          });
+
+          it('should create a new entity without _id', (done) => {
+            const newEntity = {
+              [textFieldName]: utilities.randomString()
+            };
+
+            storeToTest.save(newEntity)
+              .then((createdEntity) => {
+                expect(createdEntity._id).to.exist;
+                expect(createdEntity[textFieldName]).to.equal(newEntity[textFieldName]);
+                if (dataStoreType === Kinvey.DataStoreType.Sync) {
+                  expect(createdEntity._kmd.local).to.be.true;
+                } else {
+                  utilities.assertEntityMetadata(createdEntity);
+                }
+                newEntity._id = createdEntity._id;
+                return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+              })
+              .then(() => {
+                return utilities.validatePendingSyncCount(dataStoreType, collectionName, 1);
+              })
+              .then(() => done())
+              .catch(done);
+          });
+
+          it('should create a new entity using its _id', (done) => {
+            const id = utilities.randomString();
+            const textFieldValue = utilities.randomString();
+            const newEntity = utilities.getEntity(id, textFieldValue);
+
+            storeToTest.save(newEntity)
+              .then((createdEntity) => {
+                expect(createdEntity._id).to.equal(id);
+                expect(createdEntity[textFieldName]).to.equal(textFieldValue);
+                return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+              })
+              .then(() => done())
+              .catch(done);
+          });
+
+          it('should update an existing entity', (done) => {
+            const entityToUpdate = {
+              _id: entity1._id,
+              [textFieldName]: entity1[textFieldName],
+              newProperty: utilities.randomString()
+            };
+
+            storeToTest.save(entityToUpdate)
+              .then((updatedEntity) => {
+                expect(updatedEntity._id).to.equal(entity1._id);
+                expect(updatedEntity.newProperty).to.equal(entityToUpdate.newProperty);
+                return utilities.validateEntity(dataStoreType, collectionName, entityToUpdate, 'newProperty');
+              })
+              .then(() => utilities.validatePendingSyncCount(dataStoreType, collectionName, 1))
+              .then(() => done())
+              .catch(done);
+          });
         });
 
-        it('should create a new entity without _id', (done) => {
-          const newEntity = {
-            [textFieldName]: utilities.randomString()
-          };
+        describe('create()', () => {
+          it('should throw an error when trying to create an array of entities', (done) => {
+            storeToTest.create([entity1, entity2])
+              .catch((error) => {
+                expect(error.message).to.equal('Unable to create an array of entities.');
+                done();
+              })
+              .catch(done);
+          });
 
-          storeToTest.save(newEntity)
-            .then((createdEntity) => {
-              expect(createdEntity._id).to.exist;
-              expect(createdEntity[textFieldName]).to.equal(newEntity[textFieldName]);
-              if (dataStoreType === Kinvey.DataStoreType.Sync) {
-                expect(createdEntity._kmd.local).to.be.true;
-              } else {
-                utilities.assertEntityMetadata(createdEntity);
-              }
-              newEntity._id = createdEntity._id;
-              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
-            })
-            .then(() => {
-              return utilities.validatePendingSyncCount(dataStoreType, collectionName, 1);
-            })
-            .then(() => done())
-            .catch(done);
+          it.skip('should throw an error when trying to create an entity with an already existing _id', (done) => {
+            const newEntity = {
+              [textFieldName]: utilities.randomString()
+            };
+
+            storeToTest.create(newEntity)
+              .then((createdEntity) => storeToTest.create({ _id: createdEntity._id }))
+              .then(done(new Error('Should not be called')))
+              .catch((error) => {
+                expect(error.debug).to.equal('An entity with that _id already exists in this collection');
+                done();
+              })
+              .catch(done);
+          });
+
+          it('should create a new entity without _id', (done) => {
+            const newEntity = {
+              [textFieldName]: utilities.randomString()
+            };
+
+            storeToTest.create(newEntity)
+              .then((createdEntity) => {
+                expect(createdEntity._id).to.exist;
+                expect(createdEntity[textFieldName]).to.equal(newEntity[textFieldName]);
+                if (dataStoreType === Kinvey.DataStoreType.Sync) {
+                  expect(createdEntity._kmd.local).to.be.true;
+                } else {
+                  utilities.assertEntityMetadata(createdEntity);
+                }
+                newEntity._id = createdEntity._id;
+                return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+              })
+              .then(() => {
+                return utilities.validatePendingSyncCount(dataStoreType, collectionName, 1);
+              })
+              .then(() => done())
+              .catch(done);
+          });
+
+          it('should create a new entity using its _id', (done) => {
+            const id = utilities.randomString();
+            const textFieldValue = utilities.randomString();
+            const newEntity = utilities.getEntity(id, textFieldValue);
+
+            storeToTest.create(newEntity)
+              .then((createdEntity) => {
+                expect(createdEntity._id).to.equal(id);
+                expect(createdEntity[textFieldName]).to.equal(textFieldValue);
+                return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+              })
+              .then(() => done())
+              .catch(done);
+          });
         });
 
-        it('should create a new entity using its _id', (done) => {
-          const id = utilities.randomString();
-          const textFieldValue = utilities.randomString();
-          const newEntity = utilities.getEntity(id, textFieldValue);
+        describe('update()', () => {
+          it('should throw an error when trying to update an array of entities', (done) => {
+            storeToTest.update([entity1, entity2])
+              .catch((error) => {
+                expect(error.message).to.equal('Unable to update an array of entities.');
+                done();
+              })
+              .catch(done);
+          });
 
-          storeToTest.save(newEntity)
-            .then((createdEntity) => {
-              expect(createdEntity._id).to.equal(id);
-              expect(createdEntity[textFieldName]).to.equal(textFieldValue);
-              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
-            })
-            .then(() => done())
-            .catch(done);
-        });
+          it('should throw an error when trying to update without supplying an _id', (done) => {
+            let expectedErrorMessage;
+            if (dataStoreType === Kinvey.DataStoreType.Network) {
+              expectedErrorMessage = 'Unable to update entity.';
+            }
+            else {
+              expectedErrorMessage = 'The entity provided does not contain an _id';
+            }
+            storeToTest.update({ test: 'test' })
+              .catch((error) => {
+                expect(error.message).to.contain(expectedErrorMessage);
+                done();
+              })
+              .catch(done);
+          });
 
-        it('should update an existing entity', (done) => {
-          const entityToUpdate = {
-            _id: entity1._id,
-            [textFieldName]: entity1[textFieldName],
-            newProperty: utilities.randomString()
-          };
+          it('with a not existing _id should create a new entity using the supplied _id', (done) => {
+            const id = utilities.randomString();
+            const textFieldValue = utilities.randomString();
+            const newEntity = utilities.getEntity(id, textFieldValue);
 
-          storeToTest.save(entityToUpdate)
-            .then((updatedEntity) => {
-              expect(updatedEntity._id).to.equal(entity1._id);
-              expect(updatedEntity.newProperty).to.equal(entityToUpdate.newProperty);
-              return utilities.validateEntity(dataStoreType, collectionName, entityToUpdate, 'newProperty');
-            })
-            .then(() => utilities.validatePendingSyncCount(dataStoreType, collectionName, 1))
-            .then(() => done())
-            .catch(done);
-        });
-      });
+            storeToTest.update(newEntity)
+              .then((createdEntity) => {
+                expect(createdEntity._id).to.equal(id);
+                expect(createdEntity[textFieldName]).to.equal(textFieldValue);
+                return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+              })
+              .then(() => done())
+              .catch(done);
+          });
 
-      describe('create()', () => {
-        before((done) => {
-          utilities.cleanUpCollectionData(collectionName)
-            .then(() => utilities.saveEntities(collectionName, [entity1, entity2]))
-            .then(() => done())
-            .catch(done);
-        });
+          it('should update an existing entity', (done) => {
+            const entityToUpdate = {
+              _id: entity1._id,
+              [textFieldName]: entity1[textFieldName],
+              newProperty: utilities.randomString()
+            };
 
-        it('should throw an error when trying to create an array of entities', (done) => {
-          storeToTest.create([entity1, entity2])
-            .catch((error) => {
-              expect(error.message).to.equal('Unable to create an array of entities.');
-              done();
-            })
-            .catch(done);
-        });
-
-        it.skip('should throw an error when trying to create an entity with an already existing _id', (done) => {
-          const newEntity = {
-            [textFieldName]: utilities.randomString()
-          };
-
-          storeToTest.create(newEntity)
-            .then((createdEntity) => storeToTest.create({ _id: createdEntity._id }))
-            .catch((error) => {
-              expect(error.debug).to.equal('An entity with that _id already exists in this collection');
-              done();
-            })
-            .catch(done);
-        });
-
-        it('should create a new entity without _id', (done) => {
-          const newEntity = {
-            [textFieldName]: utilities.randomString()
-          };
-
-          storeToTest.create(newEntity)
-            .then((createdEntity) => {
-              expect(createdEntity._id).to.exist;
-              expect(createdEntity[textFieldName]).to.equal(newEntity[textFieldName]);
-              if (dataStoreType === Kinvey.DataStoreType.Sync) {
-                expect(createdEntity._kmd.local).to.be.true;
-              } else {
-                utilities.assertEntityMetadata(createdEntity);
-              }
-              newEntity._id = createdEntity._id;
-              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
-            })
-            .then(() => {
-              return utilities.validatePendingSyncCount(dataStoreType, collectionName, 1);
-            })
-            .then(() => done())
-            .catch(done);
-        });
-
-        it('should create a new entity using its _id', (done) => {
-          const id = utilities.randomString();
-          const textFieldValue = utilities.randomString();
-          const newEntity = utilities.getEntity(id, textFieldValue);
-
-          storeToTest.create(newEntity)
-            .then((createdEntity) => {
-              expect(createdEntity._id).to.equal(id);
-              expect(createdEntity[textFieldName]).to.equal(textFieldValue);
-              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
-            })
-            .then(() => done())
-            .catch(done);
-        });
-      });
-
-      describe('update()', () => {
-        before((done) => {
-          utilities.cleanUpCollectionData(collectionName)
-            .then(() => utilities.saveEntities(collectionName, [entity1, entity2]))
-            .then(() => done())
-            .catch(done);
-        });
-
-        it('should throw an error when trying to update an array of entities', (done) => {
-          storeToTest.update([entity1, entity2])
-            .catch((error) => {
-              expect(error.message).to.equal('Unable to update an array of entities.');
-              done();
-            })
-            .catch(done);
-        });
-
-        it('should throw an error when trying to update without supplying an _id', (done) => {
-          let expectedErrorMessage;
-          if (dataStoreType === Kinvey.DataStoreType.Network) {
-            expectedErrorMessage = 'Unable to update entity.';
-          }
-          else {
-            expectedErrorMessage = 'The entity provided does not contain an _id';
-          }
-          storeToTest.update({ test: 'test' })
-            .catch((error) => {
-              expect(error.message).to.contain(expectedErrorMessage);
-              done();
-            })
-            .catch(done);
-        });
-
-        it('with a not existing _id should create a new entity using the supplied _id', (done) => {
-          const id = utilities.randomString();
-          const textFieldValue = utilities.randomString();
-          const newEntity = utilities.getEntity(id, textFieldValue);
-
-          storeToTest.update(newEntity)
-            .then((createdEntity) => {
-              expect(createdEntity._id).to.equal(id);
-              expect(createdEntity[textFieldName]).to.equal(textFieldValue);
-              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
-            })
-            .then(() => done())
-            .catch(done);
-        });
-
-        it('should update an existing entity', (done) => {
-          const entityToUpdate = {
-            _id: entity1._id,
-            [textFieldName]: entity1[textFieldName],
-            newProperty: utilities.randomString()
-          };
-
-          storeToTest.update(entityToUpdate)
-            .then((updatedEntity) => {
-              expect(updatedEntity._id).to.equal(entity1._id);
-              expect(updatedEntity.newProperty).to.equal(entityToUpdate.newProperty);
-              return utilities.validateEntity(dataStoreType, collectionName, entityToUpdate, 'newProperty');
-            })
-            .then(() => utilities.validatePendingSyncCount(dataStoreType, collectionName, 1))
-            .then(() => done())
-            .catch(done);
+            storeToTest.update(entityToUpdate)
+              .then((updatedEntity) => {
+                expect(updatedEntity._id).to.equal(entity1._id);
+                expect(updatedEntity.newProperty).to.equal(entityToUpdate.newProperty);
+                return utilities.validateEntity(dataStoreType, collectionName, entityToUpdate, 'newProperty');
+              })
+              .then(() => utilities.validatePendingSyncCount(dataStoreType, collectionName, 1))
+              .then(() => done())
+              .catch(done);
+          });
         });
       });
 
