@@ -1,5 +1,5 @@
 function testFunc() {
-  const dataStoreTypes = [Kinvey.DataStoreType.Network, Kinvey.DataStoreType.Sync, Kinvey.DataStoreType.Cache];
+  const dataStoreTypes = [Kinvey.DataStoreType.Network, Kinvey.DataStoreType.Sync];
   const invalidQueryMessage = 'Invalid query. It must be an instance of the Query class.';
   const notFoundErrorName = 'NotFoundError';
   const { collectionName } = externalConfig;
@@ -1072,6 +1072,20 @@ function testFunc() {
             .catch(done);
         });
 
+        it.skip('should throw an error when trying to create an entity with an already existing _id', (done) => {
+          const newEntity = {
+            [textFieldName]: utilities.randomString()
+          };
+
+          storeToTest.create(newEntity)
+          .then((createdEntity) => storeToTest.create({_id: createdEntity._id}))
+            .catch((error) => {
+              expect(error.debug).to.equal('An entity with that _id already exists in this collection');
+              done();
+            })
+            .catch(done);
+        });
+
         it('should create a new entity without _id', (done) => {
           const newEntity = {
             [textFieldName]: utilities.randomString()
@@ -1107,6 +1121,51 @@ function testFunc() {
               expect(createdEntity[textFieldName]).to.equal(textFieldValue);
               return utilities.validateEntity(dataStoreType, collectionName, newEntity);
             })
+            .then(() => done())
+            .catch(done);
+        });
+      });
+
+      describe('update()', () => {
+        before((done) => {
+          utilities.cleanUpCollectionData(collectionName)
+            .then(() => utilities.saveEntities(collectionName, [entity1, entity2]))
+            .then(() => done())
+            .catch(done);
+        });
+
+        it('should throw an error when trying to update an array of entities', (done) => {
+          storeToTest.update([entity1, entity2])
+            .catch((error) => {
+              expect(error.message).to.equal('Unable to update an array of entities.');
+              done();
+            })
+            .catch(done);
+        });
+
+        it('should throw an error when trying to update without supplying an _id', (done) => {
+          storeToTest.update({test: 'test'})
+            .catch((error) => {
+              expect(error.message).to.contain('The entity provided does not contain an _id');
+              done();
+            })
+            .catch(done);
+        });
+
+        it('should update an existing entity', (done) => {
+          const entityToUpdate = {
+            _id: entity1._id,
+            [textFieldName]: entity1[textFieldName],
+            newProperty: utilities.randomString()
+          };
+
+          storeToTest.update(entityToUpdate)
+            .then((updatedEntity) => {
+              expect(updatedEntity._id).to.equal(entity1._id);
+              expect(updatedEntity.newProperty).to.equal(entityToUpdate.newProperty);
+              return utilities.validateEntity(dataStoreType, collectionName, entityToUpdate, 'newProperty');
+            })
+            .then(() => utilities.validatePendingSyncCount(dataStoreType, collectionName, 1))
             .then(() => done())
             .catch(done);
         });
