@@ -1,5 +1,5 @@
 function testFunc() {
-  const dataStoreTypes = [Kinvey.DataStoreType.Network, Kinvey.DataStoreType.Sync];
+  const dataStoreTypes = [Kinvey.DataStoreType.Network, Kinvey.DataStoreType.Sync, Kinvey.DataStoreType.Cache];
   const invalidQueryMessage = 'Invalid query. It must be an instance of the Query class.';
   const notFoundErrorName = 'NotFoundError';
   const { collectionName } = externalConfig;
@@ -1078,7 +1078,7 @@ function testFunc() {
           };
 
           storeToTest.create(newEntity)
-          .then((createdEntity) => storeToTest.create({_id: createdEntity._id}))
+            .then((createdEntity) => storeToTest.create({ _id: createdEntity._id }))
             .catch((error) => {
               expect(error.debug).to.equal('An entity with that _id already exists in this collection');
               done();
@@ -1144,7 +1144,7 @@ function testFunc() {
         });
 
         it('should throw an error when trying to update without supplying an _id', (done) => {
-          storeToTest.update({test: 'test'})
+          storeToTest.update({ test: 'test' })
             .catch((error) => {
               expect(error.message).to.contain('The entity provided does not contain an _id');
               done();
