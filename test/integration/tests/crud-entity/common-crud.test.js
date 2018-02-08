@@ -1145,17 +1145,32 @@ function testFunc() {
 
         it('should throw an error when trying to update without supplying an _id', (done) => {
           let expectedErrorMessage;
-          if (dataStoreType === Kinvey.DataStoreType.Sync) {
-            expectedErrorMessage = 'The entity provided does not contain an _id';
+          if (dataStoreType === Kinvey.DataStoreType.Network) {
+            expectedErrorMessage = 'Unable to update entity.';
           }
           else {
-            expectedErrorMessage = 'Unable to update entity.';
+            expectedErrorMessage = 'The entity provided does not contain an _id';
           }
           storeToTest.update({ test: 'test' })
             .catch((error) => {
               expect(error.message).to.contain(expectedErrorMessage);
               done();
             })
+            .catch(done);
+        });
+
+        it('with a not existing _id should create a new entity using the supplied _id', (done) => {
+          const id = utilities.randomString();
+          const textFieldValue = utilities.randomString();
+          const newEntity = utilities.getEntity(id, textFieldValue);
+
+          storeToTest.update(newEntity)
+            .then((createdEntity) => {
+              expect(createdEntity._id).to.equal(id);
+              expect(createdEntity[textFieldName]).to.equal(textFieldValue);
+              return utilities.validateEntity(dataStoreType, collectionName, newEntity);
+            })
+            .then(() => done())
             .catch(done);
         });
 
